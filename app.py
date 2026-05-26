@@ -8,8 +8,7 @@ st.title("Metric & Power Group ⚡ UPR Input")
 st.write("---")
 
 # 2. Vector de Conexión Absoluto (Pega aquí tu cadena de Neon)
-DB_URL = "postgresql://neondb_owner:npg-w3Bf0vRM@ep-patient-pine-apfibhxx.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require"
-
+DB_URL = "postgresql://tu_usuario:tu_contraseña_nueva@tu_host.neon.tech/neondb?sslmode=require"
 def query_execute(query, params=(), fetch=False):
     with psycopg2.connect(DB_URL) as conn:
         with conn.cursor() as cur:
