@@ -47,7 +47,6 @@ alerta_tmec = st.sidebar.slider("Riesgo de Choque Arancelario T-MEC (%):", min_v
 penetracion_china = st.sidebar.slider("Índice de Canibalización por Insumo Asiático (%):", min_value=0.0, max_value=100.0, value=50.0, step=5.0)
 estres_red_cfe = st.sidebar.slider("Estrés de Capacidad Energética (Cortes de Red/CFE %):", min_value=0.0, max_value=100.0, value=20.0, step=5.0)
 
-# El Sistema 4 calcula el Factor de Perturbación Exógena Ambiental (𝛬)
 factor_perturbacion_vsm = 1.0 + ((alerta_tmec + penetracion_china + estres_red_cfe) / 300.0)
 
 # ==========================================
@@ -100,7 +99,7 @@ metrics_col3.metric("Excedente Exergético Neto disponible", f"{max(0.0, exceden
 
 if e_in_real > 0:
     if i_destroyed > e_in_real:
-        st.error(f"🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción interna y las perturbaciones del entorno han sobrepasado la potencia de entrada. El Oikos está en colapso por entropía incontrolable.")
+        st.error(f"🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción interna y las perturbaciones del entorno ({i_destroyed:,.2f} W) han sobrepasado la potencia de entrada ({e_in_real:,.2f} W). El Oikos está en colapso por entropía incontrolable.")
     else:
         eficiencia_real = ((e_in_real - i_destroyed) / e_in_real) * 100
         
@@ -109,4 +108,113 @@ if e_in_real > 0:
         elif eficiencia_real >= 60.0:
             st.warning(f"⚠️ Alerta Crítica de Entropía. Sistema disipativo ante el entorno. Eficiencia Real: {eficiencia_real:.2f}%")
         else:
-            st.error(f"
+            st.error(f"🛑 Degradación Estructural Aguda. Eficiencia crítica: {eficiencia_real:.2f}%. Pérdida inminente de viabilidad.")
+
+        # ==========================================
+        # SISTEMA 3: HOMEOSTASIS INTERNA (Disección Táctica)
+        # ==========================================
+        st.header("⚙️ SISTEMA 3: Política de Asignación Exergética Táctica")
+        st.markdown("*Distribución analítica del excedente real neto en vectores de inmunidad entrópica*")
+        
+        alloc_control_col1, alloc_control_col2, alloc_control_col3 = st.columns(3)
+        
+        with alloc_control_col1:
+            r_maint = st.slider("🛡️ Mantenimiento Físico (%):", min_value=5, max_value=40, value=15, step=1)
+        with alloc_control_col2:
+            r_assets = st.slider("📈 Reserva de Activos Reales (%):", min_value=5, max_value=40, value=15, step=1)
+        with alloc_control_col3:
+            r_slack = st.slider("🌪️ Holgura y Contingencia (%):", min_value=0, max_value=20, value=10, step=1)
+        
+        porcentaje_resiliencia_total = r_maint + r_assets + r_slack
+        porcentaje_salida = 100 - porcentaje_resiliencia_total
+        
+        if porcentaje_resiliencia_total > 90:
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total configurada ({porcentaje_resiliencia_total}%) asfixia la potencia de salida. El Oikos se vuelve un sistema cerrado estéril.")
+        elif porcentaje_resiliencia_total < 10:
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja. El capital fijo se degradará ante la entropía.")
+        else:
+            potencia_maint = excedente_neto * (r_maint / 100.0)
+            potencia_assets = excedente_neto * (r_assets / 100.0)
+            potencia_slack = excedente_neto * (r_slack / 100.0)
+            potencia_salida_util = excedente_neto * (porcentaje_salida / 100.0)
+            
+            st.subheader("📊 Distribución Final de Potencia Activa (Semaforización de Grano Fino)")
+            
+            def obtener_estilo_tarjeta(porcentaje, min_optimo, max_optimo):
+                if porcentaje < min_optimo:
+                    return "background-color: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4;"
+                elif porcentaje <= max_optimo:
+                    return "background-color: #eafaf1; color: #145a32; border: 1px solid #abebc6;"
+                else:
+                    return "background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f;"
+
+            estilo_maint = obtener_estilo_tarjeta(r_maint, 15, 30)
+            estilo_assets = obtener_estilo_tarjeta(r_assets, 15, 30)
+            estilo_slack = obtener_estilo_tarjeta(r_slack, 5, 15)
+            
+            if porcentaje_salida > 75:
+                estilo_salida = "background-color: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4;"
+            elif porcentaje_salida >= 40:
+                estilo_salida = "background-color: #eafaf1; color: #145a32; border: 1px solid #abebc6;"
+            else:
+                estilo_salida = "background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f;"
+
+            res_col1, res_col2, res_col3, out_col = st.columns(4)
+            
+            with res_col1:
+                st.markdown(f"""
+                <div style="{estilo_maint} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>⚙️ Mantenimiento</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_maint:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_maint}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with res_col2:
+                st.markdown(f"""
+                <div style="{estilo_assets} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>📦 Fondo Activos</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_assets:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_assets}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with res_col3:
+                st.markdown(f"""
+                <div style="{estilo_slack} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>🛡️ Holgura / Slack</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_slack:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_slack}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with out_col:
+                st.markdown(f"""
+                <div style="{estilo_salida} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>🚀 Salida Útil</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_salida_util:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({porcentaje_salida}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown(f"<br><p style='font-size: 16px; text-align: center;'><b>Análisis de Grano Fino:</b> La matriz ha distribuido el excedente. El color refleja el nivel de compromiso termodinámico con la inmunidad del capital fijo.</p>", unsafe_allow_html=True)
+
+        if st.button("💾 Persistir Balance Completo del VSM en el Lógos"):
+            if db_disponible:
+                try:
+                    query = "INSERT INTO metric_history (e_in, e_out, efficiency) VALUES (%s, %s, %s);"
+                    cursor.execute(query, (e_in_real, i_destroyed, eficiencia_real))
+                    conn.commit()
+                    st.info("Datos del VSM integrados a la memoria inmutable del servidor Neon.")
+                except Exception as db_err:
+                    st.error(f"Fricción al escribir en la DB: {db_err}")
+            else:
+                st.warning("⚠️ Servidor externo latente. El balance táctico del VSM ha sido calculado y retenido en la memoria local de la pantalla.")
+else:
+    st.info("A la espera de flujos de insumos y métricas de fricción para activar los sistemas de control.")
+
+st.sidebar.markdown("---")
+if not db_disponible:
+    st.sidebar.warning("📡 Estado de Red: Servidor Neon fuera de alcance (IP Limit). Operando en Modo Autónomo Local Localizado.")
+else:
+    st.sidebar.success("📡 Red: Sincronización con el Lógos central activa.")
