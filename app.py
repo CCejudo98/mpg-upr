@@ -19,7 +19,11 @@ FACTORES_CALIDAD = {
 
 st.set_page_config(page_title="MPG - Panel de Control UPR", page_icon="⚡", layout="wide")
 
-st.title("⚡ METRIC & POWER GROUP // UNIDAD DE PROCESAMIENTO REAL")
+# Configuración Estética Unificada (Bajo el alias 'st')
+st.set_page_config(page_title="MPG - Motor de Gobernabilidad", page_icon="⚡", layout="wide")
+
+st.title("⚡ MOTOR DE GOBERNABILIDAD HOMEOSTÁTICA")
+st.caption("Cleronomía Aplicada: Transducción Bioeconómica y Estabilización Exergética del Oikos")
 st.caption("Módulo de Transducción Bioeconómica y Auditoría Exergética de Grano Fino")
 
 # ==========================================
