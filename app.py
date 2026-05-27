@@ -43,7 +43,6 @@ except Exception as e:
 st.sidebar.header("📡 SISTEMA 4: Radar de Entorno Macroeconómico")
 st.sidebar.markdown("*Monitoreo de perturbaciones exógenas en el bloque de Norteamérica (2020-2026)*")
 
-# El radar captura las amenazas reales del tejido industrial y ejidal contemporáneo
 alerta_tmec = st.sidebar.slider("Riesgo de Choque Arancelario T-MEC (%):", min_value=0.0, max_value=100.0, value=35.0, step=5.0)
 penetracion_china = st.sidebar.slider("Índice de Canibalización por Insumo Asiático (%):", min_value=0.0, max_value=100.0, value=50.0, step=5.0)
 estres_red_cfe = st.sidebar.slider("Estrés de Capacidad Energética (Cortes de Red/CFE %):", min_value=0.0, max_value=100.0, value=20.0, step=5.0)
@@ -74,7 +73,6 @@ with col2:
 # ==========================================
 # SISTEMA 2: FILTRO ANTI-OSCILACIÓN Y PROCESAMIENTO
 # ==========================================
-# Entrada Exergética Real Unificada (E_in)
 e_in_real = (
     (input_kwh * FACTORES_CALIDAD["electricidad_kwh"]) +
     (input_diesel * FACTORES_CALIDAD["diesel_litros"]) +
@@ -82,12 +80,10 @@ e_in_real = (
     (input_human * FACTORES_CALIDAD["horas_hombre"])
 )
 
-# Cálculo de la fricción interna amplificada por el Radar del Sistema 4
 PENALIZACION_MERMA = 450.0  
 PENALIZACION_TIEMPO = 120.0 
 multiplicador_interno = 1.0 + (friccion_precio / 100.0)
 
-# La disipación total incorpora el impacto del entorno exógeno capturado por el Radar
 i_destroyed = ((friccion_mermas * PENALIZACION_MERMA) + (friccion_tiempo * PENALIZACION_TIEMPO)) * multiplicador_interno * factor_perturbacion_vsm
 
 # ==========================================
@@ -99,7 +95,6 @@ metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
 metrics_col1.metric("Ingreso Exergético Real (E_in)", f"{e_in_real:,.2f} Watts")
 metrics_col2.metric("Potencia Destruida (I_destroyed)", f"{i_destroyed:,.2f} Watts")
 
-# Calcular Excedente Exergético Real Neto (La materia prima del Sistema 3)
 excedente_neto = e_in_real - i_destroyed
 metrics_col3.metric("Excedente Exergético Neto disponible", f"{max(0.0, excedente_neto):,.2f} Watts")
 
@@ -117,21 +112,52 @@ if e_in_real > 0:
             st.error(f"🛑 Degradación Estructural Aguda. Eficiencia crítica: {eficiencia_real:.2f}%. Pérdida inminente de viabilidad.")
 
         # ==========================================
-        # SISTEMA 3: HOMEOSTASIS INTERNA (Asignación de Potencia)
+        # SISTEMA 3: HOMEOSTASIS INTERNA (Disección Táctica)
         # ==========================================
         st.header("⚙️ SISTEMA 3: Política de Asignación Exergética Táctica")
-        st.markdown("*Optimización homeostática del excedente neto para evitar la descapitalización del Oikos*")
+        st.markdown("*Distribución analítica del excedente real neto en vectores de inmunidad entrópica*")
         
-        # Deslizador táctico para dividir el excedente neto en dos vectores de fuerza
-        porcentaje_resiliencia = st.slider("Porcentaje destinado a la Resiliencia del Oikos (Mantenimiento, Fondos de Reserva de Activos, Contingencia):", min_value=10, max_value=90, value=40, step=5)
-        porcentaje_salida = 100 - porcentaje_resiliencia
+        # Tres barras independientes para los componentes de la resiliencia
+        alloc_control_col1, alloc_control_col2, alloc_control_col3 = st.columns(3)
         
-        potencia_resiliencia = excedente_neto * (porcentaje_resiliencia / 100.0)
-        potencia_salida_util = excedente_neto * (porcentaje_salida / 100.0)
+        with alloc_control_col1:
+            r_maint = st.slider("🛡️ Mantenimiento Físico (%):", min_value=5, max_value=40, value=15, step=1, 
+                               help="Energía útil retenida para mitigar el desgaste de maquinaria e infraestructura.")
+        with alloc_control_col2:
+            r_assets = st.slider("📈 Reserva de Activos Reales (%):", min_value=5, max_value=40, value=15, step=1,
+                                help="Potencia acumulada para reinversión en capital fijo sin pasar por la banca fiduciaria.")
+        with alloc_control_col3:
+            r_slack = st.slider("🌪️ Holgura y Contingencia (%):", min_value=0, max_value=20, value=10, step=1,
+                               help="Colchón homeostático para absorber oscilaciones de precios y desabastos imprevistos.")
         
-        alloc_col1, alloc_col2 = st.columns(2)
-        alloc_col1.info(f"🛡️ **Vector de Resiliencia Física Interna:** {potencia_resiliencia:,.2f} Watts retenidos para contrarrestar la entropía del capital fijo.")
-        alloc_col2.success(f"🚀 **Potencia Liberada de Salida Útil:** {potencia_salida_util:,.2f} Watts transferidos al entorno como valor biofísico real.")
+        # Sumatoria de las fuerzas de resiliencia internas
+        porcentaje_resiliencia_total = r_maint + r_assets + r_slack
+        porcentaje_salida = 100 - porcentaje_resiliencia_total
+        
+        # Filtro regulador del Sistema 2 sobre la asignación del Sistema 3
+        if porcentaje_resiliencia_total > 90:
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total configurada ({porcentaje_resiliencia_total}%) asfixia la potencia de salida. El Oikos se vuelve un sistema cerrado estéril. No debe superar el 90%.")
+        elif porcentaje_resiliencia_total < 10:
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja. El capital fijo se degradará ante la entropía en menos de un ciclo. Debe ser de al menos el 10%.")
+        else:
+            # Cuantificación física de la energía distribuida
+            potencia_maint = excedente_neto * (r_maint / 100.0)
+            potencia_assets = excedente_neto * (r_assets / 100.0)
+            potencia_slack = excedente_neto * (r_slack / 100.0)
+            potencia_resiliencia_total = potencia_maint + potencia_assets + potencia_slack
+            potencia_salida_util = excedente_neto * (porcentaje_salida / 100.0)
+            
+            # Despliegue de los resultados del arbitraje biofísico
+            st.subheader("📊 Distribución Final de Potencia Activa")
+            
+            res_col1, res_col2, res_col3, out_col = st.columns(4)
+            res_col1.info(f"⚙️ **Mantenimiento:**\n\n{potencia_maint:,.2f} W\n\n({r_maint}%)")
+            res_col2.info(f"📦 **Fondo Activos:**\n\n{potencia_assets:,.2f} W\n\n({r_assets}%)")
+            res_col3.info(f"🛡️ **Holgura/Slack:**\n\n{potencia_slack:,.2f} W\n\n({r_slack}%)")
+            
+            out_col.success(f"🚀 **Salida Útil:**\n\n{potencia_salida_util:,.2f} W\n\n({porcentaje_salida}%)")
+            
+            st.markdown(f"**Resumen de Operación:** Se retiene un **{porcentaje_resiliencia_total}%** del excedente neto ({potencia_resiliencia_total:,.2f} Watts) para blindar la soberanía del capital fijo, liberando un **{porcentaje_salida}%** al entorno industrial.")
 
         # Guardado condicional adaptativo en la base de datos
         if st.button("💾 Persistir Balance Completo del VSM en el Lógos"):
