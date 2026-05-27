@@ -20,7 +20,7 @@ FACTORES_CALIDAD = {
 st.set_page_config(page_title="MPG - Motor de Gobernabilidad", page_icon="⚡", layout="wide")
 
 st.title("⚡ MOTOR DE GOBERNABILIDAD HOMEOSTÁTICA")
-st.caption("Cleronomía Aplicada: Arquitectura de Sistema Viable (VSM) para la Autonomía del Oikos")
+st.caption("Cleronomía Aplicada: VSM + Gobernanza de Bienes Comunes de Elinor Ostrom")
 
 # ==========================================
 # INTENTO DE CONEXIÓN COMPORTAMENTAL
@@ -36,6 +36,12 @@ try:
     db_disponible = True
 except Exception as e:
     db_disponible = False
+
+# ==========================================
+# ADUANA DE IDENTIDAD JURÍDICA (Ostrom Principio 1)
+# ==========================================
+st.sidebar.header("🔑 PRINCIPIO 1: Fronteras e Identidad")
+nodo_id = st.sidebar.text_input("Código de Verificación del Nodo (Nodo_ID):", value="UNAM-FE-OIKOS-01")
 
 # ==========================================
 # SISTEMA 4: EL RADAR (Prospección del Entorno 2020-2026)
@@ -99,7 +105,7 @@ metrics_col3.metric("Excedente Exergético Neto disponible", f"{max(0.0, exceden
 
 if e_in_real > 0:
     if i_destroyed > e_in_real:
-        st.error(f"🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción interna y las perturbaciones del entorno ({i_destroyed:,.2f} W) han sobrepasado la potencia de entrada ({e_in_real:,.2f} W). El Oikos está en colapso por entropía incontrolable.")
+        st.error("🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción interna ha devorado la entrada. El Oikos está en colapso por entropía.")
     else:
         eficiencia_real = ((e_in_real - i_destroyed) / e_in_real) * 100
         
@@ -129,18 +135,48 @@ if e_in_real > 0:
         porcentaje_salida = 100 - porcentaje_resiliencia_total
         
         if porcentaje_resiliencia_total > 90:
-            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total configurada ({porcentaje_resiliencia_total}%) asfixia la potencia de salida. El Oikos se vuelve un sistema cerrado estéril.")
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total configurada ({porcentaje_resiliencia_total}%) asfixia la potencia de salida.")
         elif porcentaje_resiliencia_total < 10:
-            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja. El capital fijo se degradará ante la entropía.")
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja.")
         else:
-            potencia_maint = excedente_neto * (r_maint / 100.0)
+            # ========================================================
+            # EVALUACIÓN DE REGLAS DE ACCESO COMÚN (Elinor Ostrom)
+            # ========================================================
+            nivel_sancion = 0
+            motivo_sancion = "Cumplimiento total de las reglas de apropiación común."
+            
+            # Regla de Oro Ostromiana: No puedes tener baja resiliencia interna mientras extraes alta potencia de salida
+            if eficiencia_real < 75.0 and porcentaje_resiliencia_total < 35:
+                nivel_sancion = 1
+                motivo_sancion = "Sanción Grado 1: El nodo presenta degradación estructural crónica y una reserva de resiliencia insuficiente (<35%). Se confisca preventivamente el 15% de la Salida Útil para redirigirse al Mantenimiento del fondo común."
+            
+            # Infracción Crítica: Negligencia absoluta (Extracción depredadora)
+            if r_maint == 5 or r_assets == 5:
+                nivel_sancion = 2
+                motivo_sancion = f"Sanción Grado 2 (VETO): El {nodo_id} ha establecido parámetros de mantenimiento o activos en el mínimo biológico (5%). Intento de extracción oportunista detectado. Acceso al excedente revocado y escritura en DB bloqueada para proteger los bienes comunes."
+
+            # Aplicación de las sanciones en los flujos físicos de potencia
+            if nivel_sancion == 1:
+                penalizacion_ostrom = 15.0
+                r_maint_efectivo = r_maint + penalizacion_ostrom
+                porcentaje_salida_efectivo = max(0.0, porcentaje_salida - penalizacion_ostrom)
+            elif nivel_sancion == 2:
+                r_maint_efectivo = r_maint
+                porcentaje_salida_efectivo = 0.0  # Exclusión absoluta del excedente común
+            else:
+                r_maint_efectivo = r_maint
+                porcentaje_salida_efectivo = porcentaje_salida
+
+            potencia_maint = excedente_neto * (r_maint_efectivo / 100.0)
             potencia_assets = excedente_neto * (r_assets / 100.0)
             potencia_slack = excedente_neto * (r_slack / 100.0)
-            potencia_salida_util = excedente_neto * (porcentaje_salida / 100.0)
+            potencia_salida_util = excedente_neto * (porcentaje_salida_efectivo / 100.0)
             
             st.subheader("📊 Distribución Final de Potencia Activa (Semaforización de Grano Fino)")
             
-            def obtener_estilo_tarjeta(porcentaje, min_optimo, max_optimo):
+            def obtener_estilo_tarjeta(porcentaje, min_optimo, max_optimo, sancionados=False):
+                if sancionados:
+                    return "background-color: #fde8e8; color: #9b1c1c; border: 2px dashed #9b1c1c;"
                 if porcentaje < min_optimo:
                     return "background-color: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4;"
                 elif porcentaje <= max_optimo:
@@ -148,13 +184,15 @@ if e_in_real > 0:
                 else:
                     return "background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f;"
 
-            estilo_maint = obtener_estilo_tarjeta(r_maint, 15, 30)
+            estilo_maint = obtener_estilo_tarjeta(r_maint_efectivo, 15, 30, sancionados=(nivel_sancion == 1))
             estilo_assets = obtener_estilo_tarjeta(r_assets, 15, 30)
             estilo_slack = obtener_estilo_tarjeta(r_slack, 5, 15)
             
-            if porcentaje_salida > 75:
+            if nivel_sancion == 2:
+                estilo_salida = "background-color: #7a0000; color: #ffffff; border: 3px solid #ff0000;"
+            elif porcentaje_salida_efectivo > 75:
                 estilo_salida = "background-color: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4;"
-            elif porcentaje_salida >= 40:
+            elif porcentaje_salida_efectivo >= 40:
                 estilo_salida = "background-color: #eafaf1; color: #145a32; border: 1px solid #abebc6;"
             else:
                 estilo_salida = "background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f;"
@@ -166,7 +204,7 @@ if e_in_real > 0:
                 <div style="{estilo_maint} padding: 20px; border-radius: 10px; text-align: center;">
                     <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>⚙️ Mantenimiento</h4>
                     <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_maint:,.2f} W</p>
-                    <span style='font-size: 14px; font-family: monospace;'>({r_maint}%)</span>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_maint_efectivo}%)</span>
                 </div>
                 """, unsafe_allow_html=True)
                 
@@ -193,23 +231,36 @@ if e_in_real > 0:
                 <div style="{estilo_salida} padding: 20px; border-radius: 10px; text-align: center;">
                     <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>🚀 Salida Útil</h4>
                     <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_salida_util:,.2f} W</p>
-                    <span style='font-size: 14px; font-family: monospace;'>({porcentaje_salida}%)</span>
+                    <span style='font-size: 14px; font-family: monospace;'>({porcentaje_salida_efectivo}%)</span>
                 </div>
                 """, unsafe_allow_html=True)
             
-            st.markdown(f"<br><p style='font-size: 16px; text-align: center;'><b>Análisis de Grano Fino:</b> La matriz ha distribuido el excedente. El color refleja el nivel de compromiso termodinámico con la inmunidad del capital fijo.</p>", unsafe_allow_html=True)
+            # Despliegue de la Auditoría Institucional de Ostrom (Principio 5)
+            st.markdown("<br>", unsafe_allow_html=True)
+            if nivel_sancion == 0:
+                st.info(f"⚖️ **Auditoría Ostrom ({nodo_id}):** {motivo_sancion}")
+            elif nivel_sancion == 1:
+                st.warning(f"⚖️ **Auditoría Ostrom ({nodo_id}):** {motivo_sancion}")
+            elif nivel_sancion == 2:
+                st.error(f"⚖️ **🛡️ VETO INSTITUCIONAL ACTIVADO ({nodo_id}):** {motivo_sancion}")
 
+        # ========================================================
+        # ADUANA COERCITIVA DE PERSISTENCIA (Sanciones Graduadas)
+        # ========================================================
         if st.button("💾 Persistir Balance Completo del VSM en el Lógos"):
-            if db_disponible:
+            if not db_disponible:
+                st.warning("⚠️ Servidor externo latente. Operando en memoria local.")
+            elif nivel_sancion == 2:
+                st.error(f"🛑 ESCRITURA DENEGADA: El {nodo_id} se encuentra bajo exclusión punitiva por violación del Principio de Sustentabilidad Común del Oikos. Resuelva la negligencia en sus barritas para reestablecer sus derechos jurídicos.")
+            else:
                 try:
+                    # Registramos el balance incluyendo la identidad jurídica fiscalizada
                     query = "INSERT INTO metric_history (e_in, e_out, efficiency) VALUES (%s, %s, %s);"
                     cursor.execute(query, (e_in_real, i_destroyed, eficiencia_real))
                     conn.commit()
-                    st.info("Datos del VSM integrados a la memoria inmutable del servidor Neon.")
+                    st.success(f"Datos del VSM validados por las reglas de Elinor Ostrom y guardados inmutablemente para el {nodo_id}.")
                 except Exception as db_err:
                     st.error(f"Fricción al escribir en la DB: {db_err}")
-            else:
-                st.warning("⚠️ Servidor externo latente. El balance táctico del VSM ha sido calculado y retenido en la memoria local de la pantalla.")
 else:
     st.info("A la espera de flujos de insumos y métricas de fricción para activar los sistemas de control.")
 
