@@ -100,7 +100,7 @@ metrics_col3.metric("Excedente Exergético Neto disponible", f"{max(0.0, exceden
 
 if e_in_real > 0:
     if i_destroyed > e_in_real:
-        st.error(f"🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción interna y las perturbaciones del entorno ({i_destroyed:,.2f} W) han sobrepasado la potencia de entrada ({e_in_real:,.2f} W). El Oikos está en colapso por entropía incontrolable.")
+        st.error(f"🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción interna y las perturbaciones del entorno han sobrepasado la potencia de entrada. El Oikos está en colapso por entropía incontrolable.")
     else:
         eficiencia_real = ((e_in_real - i_destroyed) / e_in_real) * 100
         
@@ -117,47 +117,90 @@ if e_in_real > 0:
         st.header("⚙️ SISTEMA 3: Política de Asignación Exergética Táctica")
         st.markdown("*Distribución analítica del excedente real neto en vectores de inmunidad entrópica*")
         
-        # Tres barras independientes para los componentes de la resiliencia
         alloc_control_col1, alloc_control_col2, alloc_control_col3 = st.columns(3)
         
         with alloc_control_col1:
-            r_maint = st.slider("🛡️ Mantenimiento Físico (%):", min_value=5, max_value=40, value=15, step=1, 
-                               help="Energía útil retenida para mitigar el desgaste de maquinaria e infraestructura.")
+            r_maint = st.slider("🛡️ Mantenimiento Físico (%):", min_value=5, max_value=40, value=15, step=1)
         with alloc_control_col2:
-            r_assets = st.slider("📈 Reserva de Activos Reales (%):", min_value=5, max_value=40, value=15, step=1,
-                                help="Potencia acumulada para reinversión en capital fijo sin pasar por la banca fiduciaria.")
+            r_assets = st.slider("📈 Reserva de Activos Reales (%):", min_value=5, max_value=40, value=15, step=1)
         with alloc_control_col3:
-            r_slack = st.slider("🌪️ Holgura y Contingencia (%):", min_value=0, max_value=20, value=10, step=1,
-                               help="Colchón homeostático para absorber oscilaciones de precios y desabastos imprevistos.")
+            r_slack = st.slider("🌪️ Holgura y Contingencia (%):", min_value=0, max_value=20, value=10, step=1)
         
-        # Sumatoria de las fuerzas de resiliencia internas
         porcentaje_resiliencia_total = r_maint + r_assets + r_slack
         porcentaje_salida = 100 - porcentaje_resiliencia_total
         
-        # Filtro regulador del Sistema 2 sobre la asignación del Sistema 3
         if porcentaje_resiliencia_total > 90:
-            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total configurada ({porcentaje_resiliencia_total}%) asfixia la potencia de salida. El Oikos se vuelve un sistema cerrado estéril. No debe superar el 90%.")
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total configurada ({porcentaje_resiliencia_total}%) asfixia la potencia de salida. El Oikos se vuelve un sistema cerrado estéril.")
         elif porcentaje_resiliencia_total < 10:
-            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja. El capital fijo se degradará ante la entropía en menos de un ciclo. Debe ser de al menos el 10%.")
+            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja. El capital fijo se degradará ante la entropía.")
         else:
-            # Cuantificación física de la energía distribuida
             potencia_maint = excedente_neto * (r_maint / 100.0)
             potencia_assets = excedente_neto * (r_assets / 100.0)
             potencia_slack = excedente_neto * (r_slack / 100.0)
-            potencia_resiliencia_total = potencia_maint + potencia_assets + potencia_slack
             potencia_salida_util = excedente_neto * (porcentaje_salida / 100.0)
             
-            # Despliegue de los resultados del arbitraje biofísico
-            st.subheader("📊 Distribución Final de Potencia Activa")
+            st.subheader("📊 Distribución Final de Potencia Activa (Semaforización de Grano Fino)")
             
+            # FUNCIONES DE ASIGNACIÓN DE COLOR HTML/CSS SEGÚN EL UMBRAL CIBERNÉTICO
+            def obtener_estilo_tarjeta(porcentaje, min_optimo, max_optimo):
+                if porcentaje < min_optimo:
+                    return "background-color: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4;" # Rojo Peligro
+                elif porcentaje <= max_optimo:
+                    return "background-color: #eafaf1; color: #145a32; border: 1px solid #abebc6;" # Verde Óptimo
+                else:
+                    return "background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f;" # Amarillo Exceso
+
+            estilo_maint = obtener_estilo_tarjeta(r_maint, 15, 30)
+            estilo_assets = obtener_estilo_tarjeta(r_assets, 15, 30)
+            estilo_slack = obtener_estilo_tarjeta(r_slack, 5, 15)
+            
+            # La Salida Útil se evalúa de forma inversa: muy alta significa descapitalización interna (amarillo/rojo)
+            if porcentaje_salida > 75:
+                estilo_salida = "background-color: #fde8e8; color: #9b1c1c; border: 1px solid #f8b4b4;"
+            elif porcentaje_salida >= 40:
+                estilo_salida = "background-color: #eafaf1; color: #145a32; border: 1px solid #abebc6;"
+            else:
+                estilo_salida = "background-color: #fef9e7; color: #7d6608; border: 1px solid #f9e79f;"
+
             res_col1, res_col2, res_col3, out_col = st.columns(4)
-            res_col1.info(f"⚙️ **Mantenimiento:**\n\n{potencia_maint:,.2f} W\n\n({r_maint}%)")
-            res_col2.info(f"📦 **Fondo Activos:**\n\n{potencia_assets:,.2f} W\n\n({r_assets}%)")
-            res_col3.info(f"🛡️ **Holgura/Slack:**\n\n{potencia_slack:,.2f} W\n\n({r_slack}%)")
             
-            out_col.success(f"🚀 **Salida Útil:**\n\n{potencia_salida_util:,.2f} W\n\n({porcentaje_salida}%)")
+            with res_col1:
+                st.markdown(f"""
+                <div style="{estilo_maint} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>⚙️ Mantenimiento</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_maint:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_maint}%)</span>
+                </div>
+                """, unsafe_html=True)
+                
+            with res_col2:
+                st.markdown(f"""
+                <div style="{estilo_assets} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>📦 Fondo Activos</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_assets:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_assets}%)</span>
+                </div>
+                """, unsafe_html=True)
+                
+            with res_col3:
+                st.markdown(f"""
+                <div style="{estilo_slack} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>🛡️ Holgura / Slack</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_slack:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({r_slack}%)</span>
+                </div>
+                """, unsafe_html=True)
+                
+            with out_col:
+                st.markdown(f"""
+                <div style="{estilo_salida} padding: 20px; border-radius: 10px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 14px;'>🚀 Salida Útil</h4>
+                    <p style='font-size: 22px; font-weight: bold; margin: 10px 0;'>{potencia_salida_util:,.2f} W</p>
+                    <span style='font-size: 14px; font-family: monospace;'>({porcentaje_salida}%)</span>
+                </div>
+                """, unsafe_html=True)
             
-            st.markdown(f"**Resumen de Operación:** Se retiene un **{porcentaje_resiliencia_total}%** del excedente neto ({potencia_resiliencia_total:,.2f} Watts) para blindar la soberanía del capital fijo, liberando un **{porcentaje_salida}%** al entorno industrial.")
+            st.markdown(f"<br><p style='font-size: 16px; text-align: center;'><b>Análisis de Grano Fino:</b> La matriz ha distribuido el excedente. El color refleja el nivel de compromiso termodinámico con la inmunidad del capital fijo.</p>", unsafe_html=True)
 
         # Guardado condicional adaptativo en la base de datos
         if st.button("💾 Persistir Balance Completo del VSM en el Lógos"):
