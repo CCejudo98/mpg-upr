@@ -17,7 +17,6 @@ FACTORES_CALIDAD = {
     "horas_hombre": 75.0
 }
 
-# Configuración Estética Unificada (Modernismo Noire y Cleronomía)
 st.set_page_config(page_title="MPG - Motor de Gobernabilidad", page_icon="⚡", layout="wide")
 
 st.title("⚡ MOTOR DE GOBERNABILIDAD HOMEOSTÁTICA")
@@ -59,7 +58,7 @@ with col2:
     friccion_precio = st.slider("Índice de oscilación de precios fiduciarios (Volatilidad Nominal %):", min_value=0.0, max_value=100.0, value=0.0, step=1.0)
 
 # ==========================================
-# CÁLCULO ALGURÍTMICO DE ENTRADA REAL (E_in)
+# CÁLCULO ALGORÍTMICO DE ENTRADA REAL (E_in)
 # ==========================================
 e_in_real = (
     (input_kwh * FACTORES_CALIDAD["electricidad_kwh"]) +
@@ -71,13 +70,10 @@ e_in_real = (
 # ==========================================
 # MÓDULO CIBERNÉTICO DE FRICCIÓN INTERNA (I_destroyed)
 # ==========================================
-# Penalizadores físicos determinados por el desorden organizativo
-PENALIZACION_MERMA = 450.0  # Watts destruidos por unidad de desecho material
-PENALIZACION_TIEMPO = 120.0 # Watts disipados por cada minuto latente de parálisis estructural
-# La oscilación fiduciaria actúa como un amplificador de entropía que degrada la eficiencia general (0-100%)
+PENALIZACION_MERMA = 450.0  
+PENALIZACION_TIEMPO = 120.0 
 multiplicador_fiduciario = 1.0 + (friccion_precio / 100.0)
 
-# El output exógeno manual ha sido destruido; la disipación se calcula endógenamente aquí:
 i_destroyed = ((friccion_mermas * PENALIZACION_MERMA) + (friccion_tiempo * PENALIZACION_TIEMPO)) * multiplicador_fiduciario
 
 # ==========================================
@@ -90,16 +86,18 @@ metrics_col1.metric("Entrada Exergética Real Unificada (E_in)", f"{e_in_real:,.
 metrics_col2.metric("Potencia Exergética Destruida Algorítmica (I_destroyed)", f"{i_destroyed:,.2f} Watts")
 
 if e_in_real > 0:
-    # Verificación estricta de la frontera física y organizativa
     if i_destroyed > e_in_real:
         st.error(f"⚠️ VIOLACIÓN TERMODINÁMICA: El desorden organizativo genera una fricción acumulada ({i_destroyed:,.2f} W) que supera la potencia exergética real ingresada ({e_in_real:,.2f} W). Este Oikos está en colapso destructivo irreversible.")
     else:
         eficiencia_real = ((e_in_real - i_destroyed) / e_in_real) * 100
         
-        if eficiencia_real >= 50.0:
+        # CALIBRACIÓN DE UMBRALES DE CONTROL SOBERANO
+        if eficiencia_real >= 85.0:
             st.success(f"✅ Homeostasis Consolidada. Eficiencia Exergética Real del Oikos: {eficiencia_real:.2f}%")
+        elif eficiencia_real >= 60.0:
+            st.warning(f"⚠️ Alerta Crítica de Entropía. El sistema es viable pero altamente disipativo. Eficiencia Real: {eficiencia_real:.2f}%. Se requiere arbitraje inmediato de activos.")
         else:
-            st.warning(f"⚠️ Alerta Crítica de Entropía. El sistema es viable pero disipativo. Eficiencia Real: {eficiencia_real:.2f}%. Se sugiere arbitraje inmediato de activos.")
+            st.error(f"🛑 Degradación Estructural Aguda. La eficiencia ha caído al {eficiencia_real:.2f}%. Pérdida inminente de viabilidad.")
         
         # Guardado condicional adaptativo
         if st.button("💾 Persistir Medición en la Memoria"):
@@ -112,11 +110,10 @@ if e_in_real > 0:
                 except Exception as db_err:
                     st.error(f"Fricción al escribir en la DB: {db_err}")
             else:
-                st.warning("⚠️ Servidor externo latente. La medición ha sido procesada y retenida en la memoria volátil de la pantalla para evitar pérdida de datos.")
+                st.warning("⚠️ Servidor externo latente. La medición ha sido procesada y retenida en la memoria volátil de la pantalla.")
 else:
     st.info("A la espera de flujos de insumos y métricas de fricción en las fronteras del sistema.")
 
-# Estatus del perímetro en barra lateral
 if not db_disponible:
     st.sidebar.markdown("---")
     st.sidebar.warning("📡 Estado de Red: Servidor Neon fuera de alcance (IP Limit). Operando en Modo Autónomo Local Localizado.")
