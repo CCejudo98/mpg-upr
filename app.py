@@ -20,23 +20,28 @@ FACTORES_CALIDAD = {
 st.set_page_config(page_title="MPG - Motor de Gobernabilidad", page_icon="⚡", layout="wide")
 
 # ==========================================
-# CÁPSULA ESTÉTICA: MODERNISMO NOIRE AVANZADO
+# CÁPSULA ESTÉTICA: MODERNISMO NOIRE AVANZADO (CON BARRA GRIS OXFORD)
 # ==========================================
 st.markdown("""
 <style>
-    /* Atmósfera Noire Absoluta */
+    /* Fondo del Contenedor Principal (Negro Absoluto) */
     .stApp {
         background-color: #080808;
         color: #dcdcdc;
         font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     }
     
-    /* Barra Lateral Funcionalista */
-    [data-testid="stSidebar"] {
-        background-color: #0f0f0f;
-        border-right: 1px solid #1c1c1c;
+    /* LA BARRA LATERAL: Mutación Completa a Gris Oxford Coherente */
+    [data-testid="stSidebar"], [data-testid="stSidebar"] > div:first-child {
+        background-color: #1a1a1a !important;
+        border-right: 1px solid #2d2d2d !important;
     }
     
+    /* Forzar el color de fondo en los contenedores internos de la barra sidebar */
+    section[data-testid="stSidebar"] .stMarkdown, section[data-testid="stSidebar"] h2, section[data-testid="stSidebar"] h4 {
+        color: #f5f5f5 !important;
+    }
+
     /* Tipografía Rigurosa y Sobria */
     h1, h2, h3, h4, h5, h6, label {
         color: #f5f5f5 !important;
@@ -60,7 +65,7 @@ st.markdown("""
 
     /* Líneas Divisoras de Baja Entropía */
     hr {
-        border-top: 1px solid #1a1a1a !important;
+        border-top: 1px solid #2d2d2d !important;
         margin-top: 2rem !important;
         margin-bottom: 2rem !important;
     }
@@ -148,7 +153,7 @@ st.header("📊 Balances de Coherencia Cibernética")
 
 excedente_neto = e_in_real - i_destroyed
 
-# INTERFAZ BRUTALISTA CON FONDO GRIS OXFORD (#1a1a1a) DE ALTO CONTRASTE
+# INDICADORES EN CAJAS BRUTALISTAS DE GRIS OXFORD
 metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
 
 with metrics_col1:
@@ -246,14 +251,13 @@ if e_in_real > 0:
             
             st.subheader("📊 Distribución de Potencia Activa (Grano Fino)")
             
-            # DISEÑO MONOLÍTICO NOIRE MEJORADO CON GRIS OXFORD COMO BASE DE CONTROL
             def obtener_estilo_noire(porcentaje, min_optimo, max_optimo, sancionados=False):
                 if sancionados:
                     return "background-color: #261212; color: #ff6b6b; border: 1px dashed #ef4444;"
                 if porcentaje < min_optimo:
                     return "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
                 elif porcentaje <= max_optimo:
-                    return "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;" # Gris Oxford + Verde
+                    return "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;"
                 else:
                     return "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
 
@@ -266,7 +270,7 @@ if e_in_real > 0:
             elif porcentaje_salida_efectivo > 75:
                 estilo_salida = "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
             elif porcentaje_salida_efectivo >= 40:
-                estilo_salida = "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;" # Gris Oxford + Verde
+                estilo_salida = "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;"
             else:
                 estilo_salida = "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
 
