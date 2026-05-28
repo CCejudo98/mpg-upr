@@ -266,4 +266,78 @@ if e_in_real > 0:
             elif porcentaje_salida_efectivo > 75:
                 estilo_salida = "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
             elif porcentaje_salida_efectivo >= 40:
-                estilo_salida = "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14
+                estilo_salida = "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;" # Gris Oxford + Verde
+            else:
+                estilo_salida = "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
+
+            res_col1, res_col2, res_col3, out_col = st.columns(4)
+            
+            with res_col1:
+                st.markdown(f"""
+                <div style="{estilo_maint} padding: 25px; border-radius: 4px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>⚙️ Mantenimiento</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_maint:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_maint_efectivo}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with res_col2:
+                st.markdown(f"""
+                <div style="{estilo_assets} padding: 25px; border-radius: 4px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>📦 Fondo Activos</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_assets:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_assets}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with res_col3:
+                st.markdown(f"""
+                <div style="{estilo_slack} padding: 25px; border-radius: 4px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>🛡️ Holgura / Slack</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_slack:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_slack}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+                
+            with out_col:
+                st.markdown(f"""
+                <div style="{estilo_salida} padding: 25px; border-radius: 4px; text-align: center;">
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #ffffff;'>🚀 Salida Útil</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_salida_util:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({porcentaje_salida_efectivo}%)</span>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            st.markdown("<br>", unsafe_allow_html=True)
+            if nivel_sancion == 0:
+                st.info(f"⚖️ **Auditoría Ostrom ({nodo_id}):** {motivo_sancion}")
+            elif nivel_sancion == 1:
+                st.warning(f"⚖️ **Auditoría Ostrom ({nodo_id}):** {motivo_sancion}")
+            elif nivel_sancion == 2:
+                st.error(f"⚖️ **🛡️ VETO INSTITUCIONAL ACTIVADO ({nodo_id}):** {motivo_sancion}")
+
+        # ========================================================
+        # ADUANA COERCITIVA DE PERSISTENCIA
+        # ========================================================
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("💾 Persistir Balance Completo del VSM en el Lógos"):
+            if not db_disponible:
+                st.warning("⚠️ Servidor externo latente. Operando en memoria local localizado.")
+            elif nivel_sancion == 2:
+                st.error(f"🛑 ESCRITURA DENEGADA: El {nodo_id} viola las reglas de preservación del común.")
+            else:
+                try:
+                    query = "INSERT INTO metric_history (e_in, e_out, efficiency) VALUES (%s, %s, %s);"
+                    cursor.execute(query, (e_in_real, i_destroyed, eficiencia_real))
+                    conn.commit()
+                    st.success(f"Datos del VSM enraizados inmutablemente para el {nodo_id}.")
+                except Exception as db_err:
+                    st.error(f"Fricción al escribir en la DB: {db_err}")
+else:
+    st.info("A la espera de flujos metabólicos para iniciar el procesamiento homeostático.")
+
+st.sidebar.markdown("---")
+if not db_disponible:
+    st.sidebar.warning("📡 Red: Servidor Neon fuera de alcance. Modo Autónomo Localizado.")
+else:
+    st.sidebar.success("📡 Red: Sincronización con el Lógos activa.")
