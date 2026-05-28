@@ -17,43 +17,52 @@ FACTORES_CALIDAD = {
     "horas_hombre": 75.0
 }
 
-# Configuración de Página de Grano Fino
 st.set_page_config(page_title="MPG - Motor de Gobernabilidad", page_icon="⚡", layout="wide")
 
 # ==========================================
-# CÁPSULA ESTÉTICA: MODERNISMO NOIRE (CSS)
+# CÁPSULA ESTÉTICA: MODERNISMO NOIRE AVANZADO
 # ==========================================
 st.markdown("""
 <style>
-    /* Inyección de la atmósfera Noire en el contenedor global */
+    /* Atmósfera Noire Absoluta */
     .stApp {
-        background-color: #0d0d0d;
-        color: #d1d1d1;
-        font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        background-color: #080808;
+        color: #dcdcdc;
+        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
     }
     
-    /* Configuración funcionalista para barras laterales */
+    /* Barra Lateral Funcionalista */
     [data-testid="stSidebar"] {
-        background-color: #141414;
-        border-right: 1px solid #262626;
+        background-color: #0f0f0f;
+        border-right: 1px solid #1c1c1c;
     }
     
-    /* Títulos y tipografía de rigurosa sobriedad */
-    h1, h2, h3, h4, h5, h6, label, .stMarkdown {
-        color: #e5e5e5 !important;
-        font-weight: 400 !important;
+    /* Tipografía Rigurosa y Sobria */
+    h1, h2, h3, h4, h5, h6, label {
+        color: #f5f5f5 !important;
+        font-weight: 500 !important;
+        letter-spacing: -0.5px !important;
     }
     
-    /* Customización de entradas numéricas y deslizadores al acero industrial */
+    /* Entradas Numéricas Acero Industrial */
     .stNumberInput input, .stTextInput input {
-        background-color: #1a1a1a !important;
+        background-color: #121212 !important;
         color: #ffffff !important;
-        border: 1px solid #333333 !important;
+        border: 1px solid #222222 !important;
+        font-family: monospace !important;
+        font-size: 16px !important;
     }
     
-    /* Líneas horizontales de separación de baja entropía */
+    /* Estilización de los Deslizadores */
+    .stSlider {
+        padding-bottom: 20px !important;
+    }
+
+    /* Líneas Divisoras de Baja Entropía */
     hr {
-        border-top: 1px solid #262626 !important;
+        border-top: 1px solid #1a1a1a !important;
+        margin-top: 2rem !important;
+        margin-bottom: 2rem !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -137,12 +146,36 @@ i_destroyed = ((friccion_mermas * PENALIZACION_MERMA) + (friccion_tiempo * PENAL
 st.markdown("---")
 st.header("📊 Balances de Coherencia Cibernética")
 
-metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
-metrics_col1.metric("Ingreso Exergético Real (E_in)", f"{e_in_real:,.2f} Watts")
-metrics_col2.metric("Potencia Destruida (I_destroyed)", f"{i_destroyed:,.2f} Watts")
-
 excedente_neto = e_in_real - i_destroyed
-metrics_col3.metric("Excedente Neto Disponible", f"{max(0.0, excedente_neto):,.2f} Watts")
+
+# INTERFAZ BRUTALISTA DE ALTO IMPACTO PARA NÚMEROS (SUSTITUYE st.metric NATIVO)
+metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
+
+with metrics_col1:
+    st.markdown(f"""
+    <div style="background-color: #111111; padding: 20px; border: 1px solid #222222; border-radius: 4px; text-align: left;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #777777; font-weight: bold;">Ingreso Exergético Real (E_in)</span>
+        <p style="font-size: 38px; font-family: 'Courier New', monospace; font-weight: bold; color: #ffffff; margin: 10px 0 0 0;">{e_in_real:,.2f} <span style="font-size: 18px; color: #555555;">W</span></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with metrics_col2:
+    st.markdown(f"""
+    <div style="background-color: #111111; padding: 20px; border: 1px solid #222222; border-radius: 4px; text-align: left;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #777777; font-weight: bold;">Potencia Destruida (I_destroyed)</span>
+        <p style="font-size: 38px; font-family: 'Courier New', monospace; font-weight: bold; color: #ff6b6b; margin: 10px 0 0 0;">{i_destroyed:,.2f} <span style="font-size: 18px; color: #773333;">W</span></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with metrics_col3:
+    st.markdown(f"""
+    <div style="background-color: #111111; padding: 20px; border: 1px solid #222222; border-radius: 4px; text-align: left;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #777777; font-weight: bold;">Excedente Neto Disponible</span>
+        <p style="font-size: 38px; font-family: 'Courier New', monospace; font-weight: bold; color: #4ade80; margin: 10px 0 0 0;">{max(0.0, excedente_neto):,.2f} <span style="font-size: 18px; color: #227744;">W</span></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
 
 if e_in_real > 0:
     if i_destroyed > e_in_real:
@@ -211,67 +244,67 @@ if e_in_real > 0:
             potencia_slack = excedente_neto * (r_slack / 100.0)
             potencia_salida_util = excedente_neto * (porcentaje_salida_efectivo / 100.0)
             
-            st.subheader("📊 Distribución de Potencia Activa (Modernismo Noire)")
+            st.subheader("📊 Distribución de Potencia Activa (Grano Fino)")
             
-            # DISEÑO DE TARJETAS AL ESTILO MODERNISMO NOIRE Y BRUTALISMO FUNCIONALISTA
+            # DISEÑO MONOLÍTICO NOIRE PARA EL SISTEMA 3
             def obtener_estilo_noire(porcentaje, min_optimo, max_optimo, sancionados=False):
                 if sancionados:
-                    return "background-color: #1a1010; color: #f87171; border: 1px dashed #ef4444;" # Alerta Roja Noire
+                    return "background-color: #1a0f0f; color: #ff6b6b; border: 1px dashed #ef4444;"
                 if porcentaje < min_optimo:
-                    return "background-color: #1a1010; color: #f87171; border: 1px solid #7f1d1d;" # Rojo Fricción
+                    return "background-color: #1a0f0f; color: #ff6b6b; border: 1px solid #7f1d1d;"
                 elif porcentaje <= max_optimo:
-                    return "background-color: #0f1612; color: #4ade80; border: 1px solid #14532d;" # Verde Exergético
+                    return "background-color: #0d1410; color: #4ade80; border: 1px solid #14532d;"
                 else:
-                    return "background-color: #1c1912; color: #facc15; border: 1px solid #713f12;" # Ámbar Exeso
+                    return "background-color: #1c180f; color: #facc15; border: 1px solid #713f12;"
 
             estilo_maint = obtener_estilo_noire(r_maint_efectivo, 15, 30, sancionados=(nivel_sancion == 1))
             estilo_assets = obtener_estilo_noire(r_assets, 15, 30)
             estilo_slack = obtener_estilo_noire(r_slack, 5, 15)
             
             if nivel_sancion == 2:
-                estilo_salida = "background-color: #2d0000; color: #ff6b6b; border: 2px solid #ff0000; box-shadow: 0 0 10px #7a0000;"
+                estilo_salida = "background-color: #240a0a; color: #ff4545; border: 2px solid #ff0000; box-shadow: 0 0 15px #500;"
             elif porcentaje_salida_efectivo > 75:
-                estilo_salida = "background-color: #1a1010; color: #f87171; border: 1px solid #7f1d1d;"
+                estilo_salida = "background-color: #1a0f0f; color: #ff6b6b; border: 1px solid #7f1d1d;"
             elif porcentaje_salida_efectivo >= 40:
-                estilo_salida = "background-color: #0f1612; color: #4ade80; border: 1px solid #14532d;"
+                estilo_salida = "background-color: #0d1410; color: #4ade80; border: 1px solid #14532d;"
             else:
-                estilo_salida = "background-color: #1c1912; color: #facc15; border: 1px solid #713f12;"
+                estilo_salida = "background-color: #1c180f; color: #facc15; border: 1px solid #713f12;"
 
             res_col1, res_col2, res_col3, out_col = st.columns(4)
             
             with res_col1:
                 st.markdown(f"""
                 <div style="{estilo_maint} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #8c8c8c;'>⚙️ Mantenimiento</h4>
-                    <p style='font-size: 24px; font-weight: bold; margin: 15px 0; font-family: monospace;'>{potencia_maint:,.2f} W</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.8;'>({r_maint_efectivo}%)</span>
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>⚙️ Mantenimiento</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_maint:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_maint_efectivo}%)</span>
                 </div>
                 """, unsafe_allow_html=True)
                 
             with res_col2:
                 st.markdown(f"""
                 <div style="{estilo_assets} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #8c8c8c;'>📦 Fondo Activos</h4>
-                    <p style='font-size: 24px; font-weight: bold; margin: 15px 0; font-family: monospace;'>{potencia_assets:,.2f} W</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.8;'>({r_assets}%)</span>
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>📦 Fondo Activos</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_assets:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_assets}%)</span>
                 </div>
                 """, unsafe_allow_html=True)
                 
             with res_col3:
                 st.markdown(f"""
                 <div style="{estilo_slack} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #8c8c8c;'>🛡️ Holgura / Slack</h4>
-                    <p style='font-size: 24px; font-weight: bold; margin: 15px 0; font-family: monospace;'>{potencia_slack:,.2f} W</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.8;'>({r_slack}%)</span>
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>🛡️ Holgura / Slack</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_slack:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_slack}%)</span>
                 </div>
                 """, unsafe_allow_html=True)
                 
             with out_col:
                 st.markdown(f"""
                 <div style="{estilo_salida} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #e5e5e5;'>🚀 Salida Útil</h4>
-                    <p style='font-size: 24px; font-weight: bold; margin: 15px 0; font-family: monospace;'>{potencia_salida_util:,.2f} W</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.8;'>({porcentaje_salida_efectivo}%)</span>
+                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #ffffff;'>🚀 Salida Útil</h4>
+                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_salida_util:,.2f} W</p>
+                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({porcentaje_salida_efectivo}%)</span>
                 </div>
                 """, unsafe_allow_html=True)
             
