@@ -137,4 +137,6 @@ st.sidebar.header("📡 SISTEMA 4: Radar de Entorno")
 if foco_metabolico == "Producción Industrial (UPR)":
     st.sidebar.markdown("*Monitoreo de perturbaciones exógenas de la infraestructura física (2020-2026)*")
     var_ext_1 = st.sidebar.slider("Riesgo de Choque Arancelario T-MEC (%):", 0, 100, 35)
-    var_ext_2 = st.sidebar.
+    var_ext_2 = st.sidebar.slider("Índice de Canibalización por Insumo Asiático (%):", 0, 100, 50)
+    var_ext_3 = st.sidebar.slider("Estrés de Capacidad Energética (Red CFE %):", 0, 100, 20)
+    lambda_entorno = 1.0 + ((var_ext
