@@ -8,7 +8,7 @@ from datetime import datetime
 DB_URL = "postgresql://alexcejudo98:ep_dark_sound_p5p4wzrm@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
 # ==========================================
-# CONFIGURACIÓN DE PARÁMETROS BIOFÍSICOS E INFORMACIONALES (𝛽)
+# PARAMETRIZACIÓN BIOFÍSICA, FINANCIERA Y VALOR DE MERCADO (𝛽)
 # ==========================================
 FACTORES_CALIDAD = {
     "electricidad_kwh": 1000.0,    
@@ -22,7 +22,15 @@ FACTORES_CALIDAD = {
     "informacion_bits": 850.0      
 }
 
-st.set_page_config(page_title="MPG - Motor Homeostático", page_icon="⚡", layout="wide")
+# Costos unitarios estimados para la conversión a divisas del desperdicio (en MXN)
+COSTOS_MONETARIOS = {
+    "Producción Industrial (UPR)": 0.0045,          # MXN por Watt disipado
+    "Logística y Suministros (Termodinámica Comercial)": 1.25, # MXN por unidad de entropía
+    "Riesgo Regulatorio y Compliance (Motor de Fragilidad)": 2.50, # MXN por unidad de riesgo disipativo
+    "Coherencia de Carteras y Activos (Matriz Exergética Financiera)": 5.00 # MXN por bit de desorden cruzado
+}
+
+st.set_page_config(page_title="MPG - Core Homeostático", page_icon="⚡", layout="wide")
 
 # ==========================================
 # CÁPSULA ESTÉTICA: MODERNISMO NOIRE AVANZADO
@@ -78,7 +86,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("⚡ MOTOR DE GOBERNABILIDAD HOMEOSTÁTICA")
-st.caption("Cleronomía Aplicada: Gestión Multidimensional de Sistemas Viables, Bienes Comunes e Inmunidad ante el Riesgo")
+st.caption("Metric & Power Group // Arquitectura SaaS de Licenciamiento Propietario para la Reducción Entrópica")
 
 # ==========================================
 # CONEXIÓN Y CREACIÓN DE ESTRUCTURAS INMUTABLES
@@ -101,7 +109,7 @@ try:
         );
     """)
     conn.commit()
-    st.success("🔗 Sincronización con la base de datos central enraizada correctamente.")
+    st.success("🔗 Instancia SaaS enlazada con el repositorio central inmutable.")
     db_disponible = True
 except Exception as e:
     st.sidebar.error(f"Fricción de enlace con DB: {e}")
@@ -111,14 +119,14 @@ except Exception as e:
 # ADUANA DE IDENTIDAD SOBERANA (Ostrom Principio 1)
 # ==========================================
 st.sidebar.header("🔑 PRINCIPIO 1: Fronteras")
-nodo_id = st.sidebar.text_input("Código de Verificación del Nodo (Nodo_ID):", value="UNAM-OIKOS-GLOBAL-01")
+nodo_id = st.sidebar.text_input("Código de Licencia Activa (Nodo_ID):", value="MPG-SaaS-UNAM-01")
 
 # ==========================================
-# CONMUTADOR DE FOCO METABÓLICO (TETRADIMENSIONAL)
+# CONMUTADOR DE FOCO METABÓLICO
 # ==========================================
 st.markdown("---")
 foco_metabolico = st.radio(
-    "Seleccione la Dimensión del Diagnóstico de Coherencia:",
+    "Seleccione el Módulo de Gestión Viable a Evaluar:",
     [
         "Producción Industrial (UPR)", 
         "Logística y Suministros (Termodinámica Comercial)", 
@@ -127,6 +135,13 @@ foco_metabolico = st.radio(
     ],
     horizontal=True
 )
+
+# ==========================================
+# PARAMETRIZACIÓN COMERCIAL DEL LICENCIAMIENTO (SIDEBAR EXPANDIDA)
+# ==========================================
+st.sidebar.markdown("---")
+st.sidebar.header("💼 Modelo Comercial SaaS")
+costo_licencia = st.sidebar.number_input("Costo de Licencia MPG Anual (MXN):", min_value=0.0, value=250000.0, step=10000.0)
 
 # ==========================================
 # CONFIGURACIÓN DINÁMICA DEL RADAR (SISTEMA 4)
@@ -163,9 +178,9 @@ else:
     lambda_entorno = 1.0 + ((var_ext_1 + var_ext_2 + var_ext_3) / 300.0)
 
 # ==========================================
-# SISTEMA 1 Y SISTEMA 2: DIAGNÓSTICO DE FLUJOS Y FRICCIONES
+# SISTEMA 1 Y SISTEMA 2: DIAGNÓSTICO METABÓLICO
 # ==========================================
-st.header(f"📥 SISTEMA 1: Diagnóstico de {foco_metabolico}")
+st.header(f"📥 SISTEMA 1: Transducción del Metabolismo Real de {foco_metabolico}")
 
 col1, col2 = st.columns(2)
 
@@ -215,7 +230,7 @@ with col1:
         )
 
 with col2:
-    st.subheader("Fricciones de Vulnerabilidad Estructural")
+    st.subheader("Fricciones Estructurales e Ineficiencia Detectada")
     if foco_metabolico == "Producción Industrial (UPR)":
         friccion_1 = st.number_input("Mermas de material crítico (Kilogramos / Litros):", min_value=0.0, value=15.0)
         friccion_2 = st.number_input("Tiempos de espera o paros en línea (Minutos):", min_value=0.0, value=20.0)
@@ -251,6 +266,9 @@ st.markdown("---")
 st.header("📊 Balances de Coherencia Cibernética")
 
 excedente_neto = e_in_real - i_destroyed
+costo_unidad_disipacion = COSTOS_MONETARIOS[foco_metabolico]
+desperdicio_monetario_diario = i_destroyed * costo_unidad_disipacion
+desperdicio_anualizado = desperdicio_monetario_diario * 365.0
 
 metrics_col1, metrics_col2, metrics_col3 = st.columns(3)
 
@@ -265,7 +283,7 @@ with metrics_col1:
 with metrics_col2:
     st.markdown(f"""
     <div style="background-color: #1a1a1a; padding: 25px; border: 1px solid #2a2a2a; border-radius: 4px; text-align: left;">
-        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; font-weight: bold;">Potencia Destruida por Entropía (I_destroyed)</span>
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; font-weight: bold;">Desperdicio Exergético Detectado</span>
         <p style="font-size: 38px; font-family: 'Courier New', monospace; font-weight: bold; color: #ff6b6b; margin: 10px 0 0 0;">{i_destroyed:,.2f} <span style="font-size: 18px; color: #993333;">W/U</span></p>
     </div>
     """, unsafe_allow_html=True)
@@ -273,206 +291,233 @@ with metrics_col2:
 with metrics_col3:
     st.markdown(f"""
     <div style="background-color: #1a1a1a; padding: 25px; border: 1px solid #2a2a2a; border-radius: 4px; text-align: left;">
-        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; font-weight: bold;">Excedente de Inmunidad Neto Disponible</span>
-        <p style="font-size: 38px; font-family: 'Courier New', monospace; font-weight: bold; color: #4ade80; margin: 10px 0 0 0;">{max(0.0, excedente_neto):,.2f} <span style="font-size: 18px; color: #228844;">W/U</span></p>
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; font-weight: bold;">Pérdida Financiera Anualizada</span>
+        <p style="font-size: 38px; font-family: 'Courier New', monospace; font-weight: bold; color: #ff4545; margin: 10px 0 0 0;">${desperdicio_anualizado:,.2f} <span style="font-size: 18px; color: #772222;">MXN</span></p>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-if e_in_real > 0:
-    if i_destroyed > e_in_real:
-        st.error("🛑 VIOLACIÓN TERMODINÁMICA SISTÉMICA: La fricción y las vulnerabilidades han colapsado la entrada. Estructura inviable.")
+# ========================================================
+# PROYECTO INCENTIVO: MÓDULO DE RETORNO Y PROYECCIÓN SAAS (NUEVO)
+# ========================================================
+st.markdown("---")
+st.header("📈 Proyección de Optimización de Márgenes y ROI de la Licencia")
+st.markdown("*El software calcula el retorno no por subsidio, sino por el aumento del excedente mediante control de entropía*")
+
+# Simulamos que con el control homeostático del software se reduce un 70% del desperdicio actual
+efecto_control_mpg = 0.70 
+ahorro_anual_proyectado = desperdicio_anualizado * efecto_control_mpg
+margen_neto_recuperado_5anos = (ahorro_anual_proyectado * 5.0) - costo_licencia
+
+proy_col1, proy_col2, proy_col3 = st.columns(3)
+
+with proy_col1:
+    st.markdown(f"""
+    <div style="background-color: #0f1612; padding: 25px; border: 1px solid #14532d; border-radius: 4px; text-align: left;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #4ade80; font-weight: bold;">Ahorro Anual con Licencia MPG</span>
+        <p style="font-size: 34px; font-family: 'Courier New', monospace; font-weight: bold; color: #4ade80; margin: 10px 0 0 0;">${ahorro_anual_proyectado:,.2f} <span style="font-size: 16px;">MXN</span></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with proy_col2:
+    if ahorro_anual_proyectado > 0:
+        meses_roi = (costo_licencia / ahorro_anual_proyectado) * 12.0
+        texto_roi = f"{meses_roi:.1f} Meses" if meses_roi <= 12 else f"{(meses_roi/12.0):.1f} Años"
     else:
-        eficiencia_real = (excedente_neto / e_in_real) * 100
-        
-        if eficiencia_real >= 85.0:
-            st.success(f"✅ Homeostasis y Robustez Consolidada. Eficiencia del Sistema: {eficiencia_real:.2f}%")
-        elif eficiencia_real >= 60.0:
-            st.warning(f"⚠️ Alerta Crítica de Entropía. Sistema disipativo ante el Radar. Eficiencia Real: {eficiencia_real:.2f}%")
-        else:
-            st.error(f"🛑 Degradación Estructural Aguda. Pérdida inminente de viabilidad: {eficiencia_real:.2f}%")
+        texto_roi = "Infinito"
+    st.markdown(f"""
+    <div style="background-color: #1a1a1a; padding: 25px; border: 1px solid #333333; border-radius: 4px; text-align: left;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; font-weight: bold;">Tiempo de Amortización (ROI)</span>
+        <p style="font-size: 34px; font-family: 'Courier New', monospace; font-weight: bold; color: #ffffff; margin: 10px 0 0 0;">{texto_roi}</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-        # ==========================================
-        # SISTEMA 3: ARBITRAJE INTERNO (Ostrom)
-        # ==========================================
-        st.markdown("---")
-        st.header("⚙️ SISTEMA 3: Política de Asignación Exergética Táctica")
-        st.markdown("*Distribución analítica del excedente real neto en vectores de inmunidad de la firma*")
+with proy_col3:
+    color_excedente = "#4ade80" if margen_neto_recuperado_5anos > 0 else "#ff6b6b"
+    st.markdown(f"""
+    <div style="background-color: #111111; padding: 25px; border: 1px solid #222222; border-radius: 4px; text-align: left;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888888; font-weight: bold;">Excedente de Margen Neto (5 Años)</span>
+        <p style="font-size: 34px; font-family: 'Courier New', monospace; font-weight: bold; color: {color_excedente}; margin: 10px 0 0 0;">${margen_neto_recuperado_5anos:,.2f} <span style="font-size: 16px;">MXN</span></p>
+    </div>
+    """, unsafe_allow_html=True)
+
+# TABLA MONOLÍTICA DE PROYECCIÓN QUINQUENAL DE COSTOS Y MÁRGENES
+st.markdown("<br>", unsafe_allow_html=True)
+st.subheader("📋 Matriz de Expansión de Márgenes Quinquenal (Simulación Fuera del Equilibrio)")
+
+html_table = f"""
+<table style="width:100%; border-collapse: collapse; background-color: #111111; color: #dcdcdc; font-family: monospace; font-size: 14px; text-align: left; border: 1px solid #222222;">
+    <tr style="background-color: #1a1a1a; border-bottom: 2px solid #333333;">
+        <th style="padding: 12px; color: #ffffff;">Métrica Temporal</th>
+        <th style="padding: 12px; color: #ffffff;">Año 1</th>
+        <th style="padding: 12px; color: #ffffff;">Año 2</th>
+        <th style="padding: 12px; color: #ffffff;">Año 3</th>
+        <th style="padding: 12px; color: #ffffff;">Año 4</th>
+        <th style="padding: 12px; color: #ffffff;">Año 5</th>
+    </tr>
+    <tr style="border-bottom: 1px solid #222222;">
+        <td style="padding: 12px; font-weight: bold;">Costo Acumulado Licencia MPG</td>
+        <td style="padding: 12px;">${costo_licencia:,.2f}</td>
+        <td style="padding: 12px;">${(costo_licencia*2):,.2f}</td>
+        <td style="padding: 12px;">${(costo_licencia*3):,.2f}</td>
+        <td style="padding: 12px;">${(costo_licencia*4):,.2f}</td>
+        <td style="padding: 12px;">${(costo_licencia*5):,.2f}</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #222222; color: #4ade80; background-color: #0d1410;">
+        <td style="padding: 12px; font-weight: bold;">Ahorro por Reducción Entrópica</td>
+        <td style="padding: 12px;">${ahorro_anual_proyectado:,.2f}</td>
+        <td style="padding: 12px;">${(ahorro_anual_proyectado*2):,.2f}</td>
+        <td style="padding: 12px;">${(ahorro_anual_proyectado*3):,.2f}</td>
+        <td style="padding: 12px;">${(ahorro_anual_proyectado*4):,.2f}</td>
+        <td style="padding: 12px;">${(ahorro_anual_proyectado*5):,.2f}</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #222222; font-weight: bold; background-color: #161616;">
+        <td style="padding: 12px;">Retorno Neto para el Oikos</td>
+        <td style="padding: 12px;">${(ahorro_anual_proyectado - costo_licencia):,.2f}</td>
+        <td style="padding: 12px;">${((ahorro_anual_proyectado*2) - (costo_licencia*2)):,.2f}</td>
+        <td style="padding: 12px;">${((ahorro_anual_proyectado*3) - (costo_licencia*3)):,.2f}</td>
+        <td style="padding: 12px;">${((ahorro_anual_proyectado*4) - (costo_licencia*4)):,.2f}</td>
+        <td style="padding: 12px;">${((ahorro_anual_proyectado*5) - (costo_licencia*5)):,.2f}</td>
+    </tr>
+</table>
+"""
+st.markdown(html_table, unsafe_allow_html=True)
+
+# ==========================================
+# SISTEMA 3: ARBITRAJE INTERNO (Ostrom)
+# ==========================================
+st.markdown("---")
+st.header("⚙️ SISTEMA 3: Política de Asignación Exergética Táctica")
+st.markdown("*Distribución analítica del excedente real neto en vectores de inmunidad de la firma*")
+
+if e_in_real > 0 and i_destroyed <= e_in_real:
+    alloc_control_col1, alloc_control_col2, alloc_control_col3 = st.columns(3)
+    
+    if foco_metabolico == "Producción Industrial (UPR)":
+        label_maint = "🛡️ Mantenimiento Técnico / Infraestructura (%):"
+        label_assets = "📈 Reserva de Activos Reales (%):"
+    elif foco_metabolico == "Logísima y Suministros (Termodinámica Comercial)":
+        label_maint = "🛡️ Seguridad de Inventario y Rutas (%):"
+        label_assets = "📈 Activos Fijos Stock (%):"
+    elif foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
+        label_maint = "🛡️ NLP Leyes y Automatización (%):"
+        label_assets = "📈 Fondo Legal Indexado Preventivo (%):"
+    else: 
+        label_maint = "🛡️ Cobertura No Lineal contra Colas Pesadas (%):"
+        label_assets = "📈 Recalibración Estocástica de Portafolio (%):"
         
-        alloc_control_col1, alloc_control_col2, alloc_control_col3 = st.columns(3)
+    label_slack = "🌪️ Holgura / Amortiguación de Emergencia (%):"
+    
+    with alloc_control_col1:
+        r_maint = st.slider(label_maint, min_value=5, max_value=40, value=15, step=1)
+    with alloc_control_col2:
+        r_assets = st.slider(label_assets, min_value=5, max_value=40, value=15, step=1)
+    with alloc_control_col3:
+        r_slack = st.slider(label_slack, min_value=0, max_value=20, value=10, step=1)
+    
+    porcentaje_resiliencia_total = r_maint + r_assets + r_slack
+    porcentaje_salida = 100 - porcentaje_resiliencia_total
+    
+    if porcentaje_resiliencia_total > 90:
+        st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) asfixia la potencia útil de salida exterior.")
+    elif porcentaje_resiliencia_total < 10:
+        st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja.")
+    else:
+        nivel_sancion = 0
+        motivo_sancion = "Cumplimiento total de las reglas de apropiación común y blindaje recíproco."
         
-        if foco_metabolico == "Producción Industrial (UPR)":
-            label_maint = "🛡️ Mantenimiento Técnico / Infraestructura (%):"
-            label_assets = "📈 Reserva de Activos Reales (%):"
+        if eficiencia_real < 75.0 and porcentaje_resiliencia_total < 35:
+            nivel_sancion = 1
+            motivo_sancion = "Sanción Grado 1: El nodo presenta degradación estructural o fragilidad, y una reserva común insuficiente (<35%). Se confisca preventivamente el 15% de la Viabilidad Libre para reinyectarse al Mantenimiento Colectivo."
+        
+        if r_maint == 5 or r_assets == 5:
+            nivel_sancion = 2
+            motivo_sancion = f"Sanción Grado 2 (VETO JURÍDICO): El {nodo_id} ha desprotegido el fondo de mitigación situándolo en el mínimo legal (5%). Intento de extracción oportunista detectado. Escritura bloqueada."
+
+        if nivel_sancion == 1:
+            penalizacion_ostrom = 15.0
+            r_maint_efectivo = r_maint + penalizacion_ostrom
+            porcentaje_salida_efectivo = max(0.0, porcentaje_salida - penalizacion_ostrom)
+        elif nivel_sancion == 2:
+            r_maint_efectivo = r_maint
+            porcentaje_salida_efectivo = 0.0
+        else:
+            r_maint_efectivo = r_maint
+            porcentaje_salida_efectivo = porcentaje_salida
+
+        potencia_maint = excedente_neto * (r_maint_efectivo / 100.0)
+        potencia_assets = excedente_neto * (r_assets / 100.0)
+        potencia_slack = excedente_neto * (r_slack / 100.0)
+        potencia_salida_util = excedente_neto * (porcentaje_salida_efectivo / 100.0)
+        
+        st.subheader("📊 Distribución Final de Potencia Activa (Gris Oxford + Semaforización Noire)")
+        
+        def obtener_estilo_noire(porcentaje, min_optimo, max_optimo, sancionados=False):
+            if sancionados:
+                return "background-color: #261212; color: #ff6b6b; border: 1px dashed #ef4444;"
+            if porcentaje < min_optimo:
+                return "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
+            elif porcentaje <= max_optimo:
+                return "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;"
+            else:
+                return "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
+
+        estilo_maint = obtener_estilo_noire(r_maint_efectivo, 15, 30, sancionados=(nivel_sancion == 1))
+        estilo_assets = obtener_estilo_noire(r_assets, 15, 30)
+        estilo_slack = obtener_estilo_noire(r_slack, 5, 15)
+        
+        if nivel_sancion == 2:
+            estilo_salida = "background-color: #330d0d; color: #ff4545; border: 2px solid #ff0000; box-shadow: 0 0 15px #500;"
+        elif porcentaje_salida_efectivo > 75:
+            estilo_salida = "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
+        elif porcentaje_salida_efectivo >= 40:
+            estilo_salida = "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;"
+        else:
+            estilo_salida = "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
+
+        res_col1, res_col2, res_col3, out_col = st.columns(4)
+        
+        if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
+            title_card_1 = "⚙️ NLP Regulatorio"
+            title_card_2 = "📦 Fondo Indexado"
+            title_card_3 = "🛡️ Cobertura GAFI"
+            title_card_4 = "🚀 Viabilidad Libre"
         elif foco_metabolico == "Logística y Suministros (Termodinámica Comercial)":
-            label_maint = "🛡️ Seguridad de Inventario y Rutas (%):"
-            label_assets = "📈 Activos Fijos Stock (%):"
-        elif foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
-            label_maint = "🛡️ NLP Leyes y Automatización (%):"
-            label_assets = "📈 Fondo Legal Indexado Preventivo (%):"
-        else: 
-            label_maint = "🛡️ Cobertura No Lineal contra Colas Pesadas (%):"
-            label_assets = "📈 Recalibración Estocástica de Portafolio (%):"
-            
-        label_slack = "🌪️ Holgura / Amortiguación de Emergencia (%):"
-        
-        with alloc_control_col1:
-            r_maint = st.slider(label_maint, min_value=5, max_value=40, value=15, step=1)
-        with alloc_control_col2:
-            r_assets = st.slider(label_assets, min_value=5, max_value=40, value=15, step=1)
-        with alloc_control_col3:
-            r_slack = st.slider(label_slack, min_value=0, max_value=20, value=10, step=1)
-        
-        porcentaje_resiliencia_total = r_maint + r_assets + r_slack
-        porcentaje_salida = 100 - porcentaje_resiliencia_total
-        
-        if porcentaje_resiliencia_total > 90:
-            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) asfixia la potencia útil de salida exterior.")
-        elif porcentaje_resiliencia_total < 10:
-            st.error(f"⚠️ ERROR DE ASIGNACIÓN: La resiliencia total ({porcentaje_resiliencia_total}%) es peligrosamente baja.")
+            title_card_1 = "⚙️ Resiliencia de Rutas"
+            title_card_2 = "📦 Activos Fijos Stock"
+            title_card_3 = "🛡️ Holgura Logística"
+            title_card_4 = "🚀 Flujo de Salida"
+        elif foco_metabolico == "Coherencia de Carteras y Activos (Matriz Exergética Financiera)":
+            title_card_1 = "⚙️ Blindaje No Lineal"
+            title_card_2 = "📦 Recalibración Inf."
+            title_card_3 = "🛡️ Amortiguación Shock"
+            title_card_4 = "🚀 Excedente Líquido"
         else:
-            nivel_sancion = 0
-            motivo_sancion = "Cumplimiento total de las reglas de apropiación común y blindaje recíproco."
-            
-            if eficiencia_real < 75.0 and porcentaje_resiliencia_total < 35:
-                nivel_sancion = 1
-                motivo_sancion = "Sanción Grado 1: El nodo presenta degradación estructural o fragilidad, y una reserva común insuficiente (<35%). Se confisca preventivamente el 15% de la Viabilidad Libre para reinyectarse al Mantenimiento Colectivo."
-            
-            if r_maint == 5 or r_assets == 5:
-                nivel_sancion = 2
-                motivo_sancion = f"Sanción Grado 2 (VETO JURÍDICO): El {nodo_id} ha desprotegido el fondo de mitigación situándolo en el mínimo legal (5%). Intento de extracción oportunista detectado. Escritura bloqueada."
+            title_card_1 = "⚙️ Mantenimiento Planta"
+            title_card_2 = "📦 Fondo de Activos"
+            title_card_3 = "🛡️ Holgura Operativa"
+            title_card_4 = "🚀 Salida Útil Real"
 
-            if nivel_sancion == 1:
-                penalizacion_ostrom = 15.0
-                r_maint_efectivo = r_maint + penalizacion_ostrom
-                porcentaje_salida_efectivo = max(0.0, porcentaje_salida - penalizacion_ostrom)
-            elif nivel_sancion == 2:
-                r_maint_efectivo = r_maint
-                porcentaje_salida_efectivo = 0.0
-            else:
-                r_maint_efectivo = r_maint
-                porcentaje_salida_efectivo = porcentaje_salida
-
-            potencia_maint = excedente_neto * (r_maint_efectivo / 100.0)
-            potencia_assets = excedente_neto * (r_assets / 100.0)
-            potencia_slack = excedente_neto * (r_slack / 100.0)
-            potencia_salida_util = excedente_neto * (porcentaje_salida_efectivo / 100.0)
+        with res_col1:
+            st.markdown(f"""
+            <div style="{estilo_maint} padding: 25px; border-radius: 4px; text-align: center;">
+                <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>{title_card_1}</h4>
+                <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_maint:,.2f} W/U</p>
+                <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_maint_efectivo}%)</span>
+            </div>
+            """, unsafe_allow_html=True)
             
-            st.subheader("📊 Distribución Final de Potencia Activa (Gris Oxford + Semaforización Noire)")
+        with res_col2:
+            st.markdown(f"""
+            <div style="{estilo_assets} padding: 25px; border-radius: 4px; text-align: center;">
+                <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>{title_card_2}</h4>
+                <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_assets:,.2f} W/U</p>
+                <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_assets}%)</span>
+            </div>
+            """, unsafe_allow_html=True)
             
-            def obtener_estilo_noire(porcentaje, min_optimo, max_optimo, sancionados=False):
-                if sancionados:
-                    return "background-color: #261212; color: #ff6b6b; border: 1px dashed #ef4444;"
-                if porcentaje < min_optimo:
-                    return "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
-                elif porcentaje <= max_optimo:
-                    return "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;"
-                else:
-                    return "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
-
-            estilo_maint = obtener_estilo_noire(r_maint_efectivo, 15, 30, sancionados=(nivel_sancion == 1))
-            estilo_assets = obtener_estilo_noire(r_assets, 15, 30)
-            estilo_slack = obtener_estilo_noire(r_slack, 5, 15)
-            
-            if nivel_sancion == 2:
-                estilo_salida = "background-color: #330d0d; color: #ff4545; border: 2px solid #ff0000; box-shadow: 0 0 15px #500;"
-            elif porcentaje_salida_efectivo > 75:
-                estilo_salida = "background-color: #261212; color: #ff6b6b; border: 1px solid #7f1d1d;"
-            elif porcentaje_salida_efectivo >= 40:
-                estilo_salida = "background-color: #1a1a1a; color: #4ade80; border: 1px solid #14532d;"
-            else:
-                estilo_salida = "background-color: #211d14; color: #facc15; border: 1px solid #713f12;"
-
-            res_col1, res_col2, res_col3, out_col = st.columns(4)
-            
-            if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
-                title_card_1 = "⚙️ NLP Regulatorio"
-                title_card_2 = "📦 Fondo Indexado"
-                title_card_3 = "🛡️ Cobertura GAFI"
-                title_card_4 = "🚀 Viabilidad Libre"
-            elif foco_metabolico == "Logística y Suministros (Termodinámica Comercial)":
-                title_card_1 = "⚙️ Resiliencia de Rutas"
-                title_card_2 = "📦 Activos Fijos Stock"
-                title_card_3 = "🛡️ Holgura Logística"
-                title_card_4 = "🚀 Flujo de Salida"
-            elif foco_metabolico == "Coherencia de Carteras y Activos (Matriz Exergética Financiera)":
-                title_card_1 = "⚙️ Blindaje No Lineal"
-                title_card_2 = "📦 Recalibración Inf."
-                title_card_3 = "🛡️ Amortiguación Shock"
-                title_card_4 = "🚀 Excedente Líquido"
-            else:
-                title_card_1 = "⚙️ Mantenimiento Planta"
-                title_card_2 = "📦 Fondo de Activos"
-                title_card_3 = "🛡️ Holgura Operativa"
-                title_card_4 = "🚀 Salida Útil Real"
-
-            with res_col1:
-                st.markdown(f"""
-                <div style="{estilo_maint} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>{title_card_1}</h4>
-                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_maint:,.2f} W/U</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_maint_efectivo}%)</span>
-                </div>
-                """, unsafe_allow_html=True)
-                
-            with res_col2:
-                st.markdown(f"""
-                <div style="{estilo_assets} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>{title_card_2}</h4>
-                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_assets:,.2f} W/U</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_assets}%)</span>
-                </div>
-                """, unsafe_allow_html=True)
-                
-            with res_col3:
-                st.markdown(f"""
-                <div style="{estilo_slack} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888;'>{title_card_3}</h4>
-                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_slack:,.2f} W/U</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({r_slack}%)</span>
-                </div>
-                """, unsafe_allow_html=True)
-                
-            with out_col:
-                st.markdown(f"""
-                <div style="{estilo_salida} padding: 25px; border-radius: 4px; text-align: center;">
-                    <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #ffffff;'>{title_card_4}</h4>
-                    <p style='font-size: 26px; font-family: \"Courier New\", monospace; font-weight: bold; margin: 15px 0;'>{potencia_salida_util:,.2f} W/U</p>
-                    <span style='font-size: 12px; font-family: monospace; opacity: 0.7;'>({porcentaje_salida_efectivo}%)</span>
-                </div>
-                """, unsafe_allow_html=True)
-            
-            st.markdown("<br>", unsafe_allow_html=True)
-            if nivel_sancion == 0:
-                st.info(f"⚖️ **Auditoría Ostrom ({nodo_id}):** {motivo_sancion}")
-            elif nivel_sancion == 1:
-                st.warning(f"⚖️ **Auditoría Ostrom ({nodo_id}):** {motivo_sancion}")
-            elif nivel_sancion == 2:
-                st.error(f"⚖️ **🛡️ VETO DE CONTROL INSTITUCIONAL ACTIVADO ({nodo_id}):** {motivo_sancion}")
-
-        # ========================================================
-        # ADUANA COERCITIVA DE PERSISTENCIA
-        # ========================================================
-        st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("💾 Persistir Balance del VSM en el Lógos Inmutable"):
-            if not db_disponible:
-                st.warning("⚠️ Servidor central fuera de alcance. Registro retenido en memoria volátil de pantalla.")
-            elif nivel_sancion == 2:
-                st.error(f"🛑 ESCRITURA RECHAZADA: El {nodo_id} se encuentra bajo exclusión punitiva por desacato a las reglas de inmunidad recíproca.")
-            else:
-                try:
-                    query = "INSERT INTO metric_history (e_in, e_out, efficiency) VALUES (%s, %s, %s);"
-                    cursor.execute(query, (e_in_real, i_destroyed, eficiencia_real))
-                    conn.commit()
-                    st.success(f"Matriz de balance sellada inmutablemente para el {nodo_id}.")
-                except Exception as db_err:
-                    st.error(f"Fricción al escribir en la base de datos central: {db_err}")
-else:
-    st.info("A la espera de flujos y métricas en las fronteras del sistema para iniciar la transducción.")
-
-st.sidebar.markdown("---")
-if not db_disponible:
-    st.sidebar.warning("📡 Red: Servidor Neon fuera de alcance. Modo Autónomo Localizado Activo.")
-else:
-    st.sidebar.success("📡 Red: Canal seguro sincronizado con el Lógos.")
+        with res_col3:
+            st.markdown(f"""
+            <div style="{estilo_slack} padding: 25px; border-radius: 4px; text-align: center;">
+                <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; color: #888888
