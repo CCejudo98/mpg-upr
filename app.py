@@ -231,51 +231,35 @@ with pc3:
     </div>""", unsafe_allow_html=True)
 
 # ==========================================
-# REPARTO DE GANANCIAS (SISTEMA 3)
+# REPARTO DE GANANCIAS Y ESCUDO FISCAL (SISTEMA 3)
 # ==========================================
 st.markdown("---")
-st.header("⚙️ Plan de Reparto y Salud del Negocio")
-st.markdown("*Decida cuánto dinero se queda en la empresa para protegerla y cuánto puede retirar como ganancia*")
+st.header("⚙️ Plan de Reparto y Escudo Fiscal")
+st.markdown("*Defina sus reservas y el monto a reinvertir para reducir su carga impositiva*")
 
-sc1, sc2, sc3 = st.columns(3)
-with sc1: res_maint = st.slider("Reserva para Mantenimiento (%):", 5, 40, 15)
-with sc2: res_stock = st.slider("Reserva para Insumos/Stock (%):", 5, 40, 15)
-with sc3: res_emergencia = st.slider("Fondo para Emergencias (%):", 0, 20, 10)
+sc1, sc2, sc3, sc4 = st.columns(4)
+with sc1: res_maint = st.slider("Mantenimiento (%):", 5, 40, 15)
+with sc2: res_stock = st.slider("Stock/Activos (%):", 5, 40, 15)
+with sc3: res_emergencia = st.slider("Emergencias (%):", 0, 20, 10)
+with sc4: fiscal_invest = st.number_input("Reinversión Fiscal (MXN):", min_value=0.0, value=0.0, step=1000.0)
 
-total_reserva = res_maint + res_stock + res_emergencia
-ganancia_libre = 100 - total_reserva
-
-# Reglas de protección automática (Ostrom)
-nivel_sancion = 0
-if eficiencia_real < 75 and total_reserva < 35:
-    nivel_sancion = 1
-    st.warning("⚠️ ALERTA DE SALUD: Su eficiencia es baja. El sistema recomienda subir sus reservas para no descapitalizarse.")
-if res_maint == 5 or res_stock == 5:
-    nivel_sancion = 2
-    st.error("🛑 BLOQUEO PREVENTIVO: Sus reservas son demasiado bajas. El negocio corre riesgo de quiebra si retira dinero ahora.")
-
-# Mostrar distribución final
-if nivel_sancion == 2: ganancia_final_perc = 0
-elif nivel_sancion == 1: ganancia_final_perc = max(0, ganancia_libre - 15)
-else: ganancia_final_perc = ganancia_libre
-
-dc1, dc2, dc3, dc4 = st.columns(4)
-c_labels = ["Mantenimiento", "Stock/Activos", "Emergencias", "Ganancia Retirable"]
-c_vals = [res_maint, res_stock, res_emergencia, ganancia_final_perc]
-c_colors = ["#1a1a1a"]*3 + ["#0f3322" if nivel_sancion < 2 else "#441111"]
-
-for col, lab, val, bg in zip([dc1, dc2, dc3, dc4], c_labels, c_vals, c_colors):
-    with col:
-        st.markdown(f"""<div style="background-color: {bg}; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #333;">
-            <span style="font-size: 12px; color: #aaa;">{lab}</span>
-            <p style="font-size: 24px; font-weight: bold;">{val}%</p>
-        </div>""", unsafe_allow_html=True)
-
-st.markdown("<br>", unsafe_allow_html=True)
-if st.button("💾 Guardar Informe de Hoy"):
-    if nivel_sancion == 2: st.error("No se puede guardar: El negocio está en zona de riesgo extremo.")
-    elif db_disponible:
-        cursor.execute("INSERT INTO metric_history (e_in, e_out, efficiency) VALUES (%s, %s, %s);", (e_in_real, i_destroyed, eficiencia_real))
-        conn.commit()
-        st.success("✅ Datos guardados correctamente en la nube.")
-    else: st.info("Datos retenidos en la pantalla (Modo sin conexión).")
+# Lógica de persistencia de la directiva fiscal
+if st.button("💾 Enviar Directiva y Guardar Informe"):
+    if db_disponible:
+        try:
+            # 1. Guardado de métricas originales
+            cursor.execute("INSERT INTO metric_history (e_in, e_out, efficiency) VALUES (%s, %s, %s);", 
+                           (e_in_real, i_destroyed, eficiencia_real))
+            
+            # 2. Guardado de la Directiva Fiscal (Escritura para el Core)
+            cursor.execute("""
+                INSERT INTO public_fiscal_stats (foco, fiscal_investment, timestamp)
+                VALUES (%s, %s, CURRENT_TIMESTAMP)
+                ON CONFLICT (foco) 
+                DO UPDATE SET fiscal_investment = EXCLUDED.fiscal_investment, timestamp = CURRENT_TIMESTAMP;
+            """, (foco_metabolico, fiscal_invest))
+            
+            conn.commit()
+            st.success("✅ Directiva fiscal enviada al Core y métricas guardadas.")
+        except Exception as e:
+            st.error(f"Error en la comunicación con el Lógos: {e}")
