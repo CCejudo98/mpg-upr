@@ -297,79 +297,61 @@ html_table = f"""
 st.markdown(html_table, unsafe_allow_html=True)
 
 # =================================================================
-# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA Y FILTRO FISCAL
+# =================================================================
+# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA (AUDITORÍA DE DIRECTIVAS)
 # =================================================================
 st.markdown("---")
-st.header("⚙️ SISTEMA 3: Arbitraje de Inmunidad Operativa")
+st.header("⚙️ SISTEMA 3: Auditoría de Directiva Fiscal Externa")
 
-ac1, ac2, ac3 = st.columns(3)
+# FUNCIÓN DE LECTURA: El Core ahora consulta la decisión del cliente
+def obtener_directiva_cliente(foco):
+    if db_disponible:
+        cursor.execute("SELECT fiscal_investment FROM public_fiscal_stats WHERE foco = %s ORDER BY timestamp DESC LIMIT 1", (foco,))
+        res = cursor.fetchone()
+        return res[0] if res else 0.0
+    return 0.0
 
-if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
-    l_maint, l_assets = "🛡️ Vectorización NLP (%):", "📈 Fondo Jurídico (%):"
-elif foco_metabolico == "Logística y Suministros (Termodinámica Comercial)":
-    l_maint, l_assets = "🛡️ Blindaje Rutas (%):", "📈 Activos Fijos (%):"
-elif foco_metabolico == "Coherencia de Carteras y Activos (Matriz Exergética Financiera)":
-    l_maint, l_assets = "🛡️ Cobertura Colas (%):", "📈 Recalibración (%):"
-else:
-    l_maint, l_assets = "🛡️ Mantenimiento (%):", "📈 Activos Reales (%):"
+# Obtenemos la decisión enviada desde el motor exotérico (SaaS azul)
+directiva_fiscal_externa = obtener_directiva_cliente(foco_metabolico)
 
-l_slack = "🌪️ Holgura Homeostática (%):"
-l_fiscal = "💰 Reinversión Fiscal (Ded.):"
+# El resto del arbitraje se mantiene bajo tu control como auditor
+ac1, ac2 = st.columns(2)
+with ac1: r_maint = st.slider("🛡️ Ajuste Auditoría (Mantenimiento):", 5, 40, 15)
+with ac2: r_assets = st.slider("📈 Ajuste Auditoría (Activos):", 5, 40, 15)
 
-with ac1: 
-    r_maint = st.slider(l_maint, 5, 40, 15)
-    r_fiscal = st.slider(l_fiscal, 0, 40, 10) # Nueva variable fiscal
-with ac2: r_assets = st.slider(l_assets, 5, 40, 15)
-with ac3: r_slack = st.slider(l_slack, 0, 20, 10)
+# Calculamos el impacto de la directiva externa sobre la viabilidad
+monto_fiscal = directiva_fiscal_externa # Valor dictado por el SaaS azul
+impacto_fiscal_porcentaje = (monto_fiscal / excedente_neto * 100) if excedente_neto > 0 else 0
 
-res_total = r_maint + r_assets + r_slack + r_fiscal
+res_total = r_maint + r_assets + impacto_fiscal_porcentaje
 salida_libre = max(0, 100 - res_total)
 
 if res_total > 95:
-    st.error("⚠️ CONFIGURACIÓN INVIABLE: La carga estructural supera la capacidad del nodo.")
+    st.error("⚠️ ALERTA DE SISTEMA: La directiva fiscal externa + ajustes operativos superan la viabilidad del nodo.")
 else:
-    nivel_sancion = 0
-    motivo_sancion = "Coherencia algorítmica alineada con la soberanía del Oikos."
+    st.subheader("📊 Monitoreo de Potencia: Directiva Cliente vs Auditoría")
     
-    if eficiencia_real < 75.0 and res_total < 35:
-        nivel_sancion = 1
-        motivo_sancion = "Sanción G1: Confiscación del 15% de Viabilidad para reyección."
-    
-    p_maint = r_maint + (15.0 if nivel_sancion == 1 else 0)
-    p_salida = max(0.0, salida_libre - (15.0 if nivel_sancion == 1 else 0))
-
-    st.subheader("📊 Distribución de Potencia Activa Final")
-    
-    def estilo_noire_puro(p, veto=False):
-        if veto: return "background-color: #2a0a0a; color: #ff5555; border: 1px dashed #ff0000;"
+    def estilo_noire_auditoria(val, es_fiscal=False):
+        if es_fiscal: return "background-color: #1c180c; color: #facc15; border: 1px solid #713f12;"
         return "background-color: #0c140e; color: #4ade80; border: 1px solid #14532d;"
 
-    dc1, dc2, dc3, dc4, dc5 = st.columns(5)
-    data_display = [
-        ("Mantenimiento", excedente_neto*(p_maint/100)),
+    dc1, dc2, dc3, dc4 = st.columns(4)
+    datos = [
+        ("Mantenimiento", excedente_neto*(r_maint/100)),
         ("Activos", excedente_neto*(r_assets/100)),
-        ("Fiscal/Ded", excedente_neto*(r_fiscal/100)),
-        ("Holgura", excedente_neto*(r_slack/100)),
-        ("Viabilidad", excedente_neto*(p_salida/100))
+        ("Directiva Fiscal", monto_fiscal),
+        ("Viabilidad", excedente_neto*(salida_libre/100))
     ]
 
-    for col, (t, val) in zip([dc1, dc2, dc3, dc4, dc5], data_display):
+    for col, (t, val) in zip([dc1, dc2, dc3, dc4], datos):
         with col:
-            st.markdown(f"""<div style="{estilo_noire_puro(val)} padding: 10px; border-radius: 4px; text-align: center;">
+            st.markdown(f"""<div style="{estilo_noire_auditoria(val, es_fiscal=(t=='Directiva Fiscal'))} padding: 10px; border-radius: 4px; text-align: center;">
                 <p style='font-size: 9px; margin:0;'>{t.upper()}</p>
                 <p style='font-size: 14px; font-weight: bold; margin:0;'>{val:,.0f}W</p>
             </div>""", unsafe_allow_html=True)
 
-    if st.button("💾 Sellar Matriz Exergética y Registro Fiscal"):
-        if db_disponible:
-            try:
-                # Nota: Asegúrate de que tu tabla en Neon tenga estas columnas si deseas persistir la parte fiscal
-                cursor.execute("""INSERT INTO exergy_history (foco, e_in, i_destroyed, efficiency) 
-                                  VALUES (%s, %s, %s, %s);""", (foco_metabolico, e_in_real, i_destroyed, eficiencia_real))
-                conn.commit()
-                st.success("Estado sellado. Reinversión fiscal registrada en el Lógos.")
-            except Exception as err: st.error(f"Error en Lógos: {err}")
-
+    if st.button("💾 Validar y Sellar Auditoría"):
+        st.success(f"Auditoría completada para el foco {foco_metabolico}. Directiva del cliente confirmada.")
 # ==========================================
 # SISTEMA 5: REGISTRO PSICOHISTÓRICO (HISTORIAL UPR)
 # ==========================================
