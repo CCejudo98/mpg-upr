@@ -88,7 +88,7 @@ try:
         );
     """)
     conn.commit()
-    st.success("🔗 Sincronización inmutable con el repositorio central de exergía activa.")
+    st.success("🔗 Sincronización inmutable con el repositorio de exergía activa.")
     db_disponible = True
 except Exception as e:
     st.sidebar.error(f"Fricción de enlace con DB: {e}")
@@ -120,7 +120,6 @@ foco_metabolico = st.radio(
 # ==========================================
 st.sidebar.markdown("---")
 st.sidebar.header("📡 SISTEMA 4: Radar Termodinámico")
-st.sidebar.markdown("*Medición del desorden exógeno del entorno civilizatorio*")
 
 if foco_metabolico == "Producción Industrial (UPR)":
     v_ext_1 = st.sidebar.slider("Estrés de Capacidad Estructural Red CFE (%):", 0, 100, 25)
@@ -134,7 +133,7 @@ elif foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
     v_ext_1 = st.sidebar.slider("Tasa de Mutación Normativa en el DOF (%):", 0, 100, 50)
     v_ext_2 = st.sidebar.slider("Intensidad Fiscalizadora de Organismos Centrales (%):", 0, 100, 60)
     v_ext_3 = st.sidebar.slider("Complejidad de Restricciones GAFI/Internacionales (%):", 0, 100, 35)
-else: # Matriz Exergética Financiera
+else: 
     v_ext_1 = st.sidebar.slider("Riesgo de Ruptura de Liquidez Sistémica (%):", 0, 100, 55)
     v_ext_2 = st.sidebar.slider("Presencia de Colas Pesadas Estocásticas (%):", 0, 100, 45)
     v_ext_3 = st.sidebar.slider("Coeficiente de Acoplamiento y Pánico de Activos (%):", 0, 100, 65)
@@ -171,7 +170,7 @@ with col1:
         in_1 = st.number_input("Asignación de Capital de Baja Entropía (M-Pesos):", min_value=0.0, value=200.0)
         in_2 = st.number_input("Información Mutua Calculada Inter-Activos (Megabits):", min_value=0.0, value=60.0)
         in_3 = st.number_input("Reserva de Coherencia Fuera del Equilibrio:", min_value=0.0, value=40.0)
-        e_in_real = (in_1 * FACTORES_CALIDAD["capital_respaldo"]) + (in_2 * FACTORES_CALIDAD["informacion_bits"]) + (input_3 * FACTORES_CALIDAD["capital_respaldo"]) if 'input_3' in locals() else (in_1 * FACTORES_CALIDAD["capital_respaldo"]) + (in_2 * FACTORES_CALIDAD["informacion_bits"]) + (in_3 * FACTORES_CALIDAD["capital_respaldo"])
+        e_in_real = (in_1 * FACTORES_CALIDAD["capital_respaldo"]) + (in_2 * FACTORES_CALIDAD["informacion_bits"]) + (in_3 * FACTORES_CALIDAD["capital_respaldo"])
 
 with col2:
     st.subheader("Aniquilación de Capacidad por Irreversibilidades (Entropía Destruida)")
@@ -193,28 +192,34 @@ with col2:
         i_destroyed = ((f_1 * 4500.0) + (f_2 * 1800.0)) * lambda_entorno
 
 # ==========================================
-# CÓDIGO BRUTALISTAS DE SALUD TERMODINÁMICA (Sistema 2)
+# DIAGNÓSTICO DE LA ECUACIÓN COHERENTE (Sistema 2)
 # ==========================================
 st.markdown("---")
 st.header("📊 SISTEMA 2: Diagnóstico de la Ecuación Coherente")
 
 excedente_neto = e_in_real - i_destroyed
+soberania_exergetica = (excedente_neto / e_in_real) * 100.0 if e_in_real > 0 else 0.0
 
-mc1, mc2, mc3 = st.columns(3)
+mc1, mc2, mc3, mc4 = st.columns(4)
 with mc1:
     st.markdown(f"""<div style="background-color: #111; padding: 25px; border-radius: 4px; border: 1px solid #222;">
         <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #888; font-weight: bold;">Ingreso Exergético Real ($E_{{in}}$)</span>
-        <p style="font-size: 36px; font-family: monospace; font-weight: bold; color: #fff; margin: 10px 0 0 0;">{e_in_real:,.2f} <span style="font-size: 16px; color: #555;">W</span></p>
+        <p style="font-size: 30px; font-family: monospace; font-weight: bold; color: #fff; margin: 10px 0 0 0;">{e_in_real:,.2f} <span style="font-size: 14px; color: #555;">W</span></p>
     </div>""", unsafe_allow_html=True)
 with mc2:
     st.markdown(f"""<div style="background-color: #111; padding: 25px; border-radius: 4px; border: 1px solid #222;">
         <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #ff6b6b; font-weight: bold;">Potencia Aniquilada ($I_{{destroyed}}$)</span>
-        <p style="font-size: 36px; font-family: monospace; font-weight: bold; color: #ff6b6b; margin: 10px 0 0 0;">{i_destroyed:,.2f} <span style="font-size: 16px; color: #933;">W</span></p>
+        <p style="font-size: 30px; font-family: monospace; font-weight: bold; color: #ff6b6b; margin: 10px 0 0 0;">{i_destroyed:,.2f} <span style="font-size: 14px; color: #933;">W</span></p>
     </div>""", unsafe_allow_html=True)
 with mc3:
+    st.markdown(f"""<div style="background-color: #0b1a24; padding: 25px; border-radius: 4px; border: 1px solid #1f4e5b;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #00b4d8; font-weight: bold;">Indicador Neto UPR ($\Phi_{{UPR}}$)</span>
+        <p style="font-size: 30px; font-family: monospace; font-weight: bold; color: #90e0ef; margin: 10px 0 0 0;">{max(0.0, excedente_neto):,.2f} <span style="font-size: 14px; color: #00b4d8;">W-Neg</span></p>
+    </div>""", unsafe_allow_html=True)
+with mc4:
     st.markdown(f"""<div style="background-color: #111; padding: 25px; border-radius: 4px; border: 1px solid #222;">
-        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #4ade80; font-weight: bold;">Excedente Homeostático Neto</span>
-        <p style="font-size: 36px; font-family: monospace; font-weight: bold; color: #4ade80; margin: 10px 0 0 0;">{max(0.0, excedente_neto):,.2f} <span style="font-size: 16px; color: #284;">W</span></p>
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #4ade80; font-weight: bold;">Coeficiente de Soberanía ($S_e$)</span>
+        <p style="font-size: 30px; font-family: monospace; font-weight: bold; color: #4ade80; margin: 10px 0 0 0;">{soberania_exergetica:.2f}%</p>
     </div>""", unsafe_allow_html=True)
 
 st.markdown("<br>", unsafe_allow_html=True)
@@ -231,20 +236,80 @@ else:
     st.info("A la espera de flujos vectoriales en las fronteras de control.")
 
 # ==========================================
-# SISTEMA 3: POLÍTICA DE CONTENCIÓN ANTIENTRÓPICA (Ostrom)
+# INCENTIVO ONTOLÓGICO: ACUMULACIÓN NEGENTRÓPICA
+# ==========================================
+st.markdown("---")
+st.header("📈 Proyección de Acumulación Negentrópica y Autonomía de Variedad")
+st.markdown("*Cálculo de la capacidad de orden y blindaje psicohistórico del sistema a largo plazo (Retorno de Variedad)*")
+
+exergy_recuperada_anual = (i_destroyed * 0.75) * 365.0
+variedad_ashby_acumulada_5_anos = exergy_recuperada_anual * 5.0
+
+proy_col1, proy_col2, proy_col3 = st.columns(3)
+with proy_col1:
+    st.markdown(f"""<div style="background-color: #0f1612; padding: 25px; border: 1px solid #14532d; border-radius: 4px;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #4ade80; font-weight: bold;">Exergía Retenida Anual</span>
+        <p style="font-size: 32px; font-family: monospace; font-weight: bold; color: #4ade80; margin: 10px 0 0 0;">{exergy_recuperada_anual:,.2f} <span style="font-size: 16px;">W/año</span></p>
+    </div>""", unsafe_allow_html=True)
+with proy_col2:
+    deuda_mitigada = (exergy_recuperada_anual / 100000.0)
+    st.markdown(f"""<div style="background-color: #111; padding: 25px; border: 1px solid #222; border-radius: 4px;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; font-weight: bold;">Mitigación de Deuda Ontológica</span>
+        <p style="font-size: 32px; font-family: monospace; font-weight: bold; color: #fff; margin: 10px 0 0 0;">{deuda_mitigada:.4f} <span style="font-size: 16px;">𝜓-Core</span></p>
+    </div>""", unsafe_allow_html=True)
+with proy_col3:
+    st.markdown(f"""<div style="background-color: #111; padding: 25px; border: 1px solid #222; border-radius: 4px;">
+        <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #facc15; font-weight: bold;">Variedad Expandida (5 Años)</span>
+        <p style="font-size: 32px; font-family: monospace; font-weight: bold; color: #facc15; margin: 10px 0 0 0;">{variedad_ashby_acumulada_5_anos:,.2f} <span style="font-size: 16px;">Bits-𝛺</span></p>
+    </div>""", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+st.subheader("📋 Matriz Quinquenal de Metamorfosis de la Capacidad Estructural")
+
+html_table = f"""
+<table style="width:100%; border-collapse: collapse; background-color: #111111; color: #dcdcdc; font-family: monospace; font-size: 14px; text-align: left; border: 1px solid #222222;">
+    <tr style="background-color: #1a1a1a; border-bottom: 2px solid #333333;">
+        <th style="padding: 12px; color: #ffffff;">Dimensión Temporal</th>
+        <th style="padding: 12px; color: #ffffff;">Ciclo I</th>
+        <th style="padding: 12px; color: #ffffff;">Ciclo II</th>
+        <th style="padding: 12px; color: #ffffff;">Ciclo III</th>
+        <th style="padding: 12px; color: #ffffff;">Ciclo IV</th>
+        <th style="padding: 12px; color: #ffffff;">Ciclo V</th>
+    </tr>
+    <tr style="border-bottom: 1px solid #222222;">
+        <td style="padding: 12px; font-weight: bold;">Capacidad Negentrópica Acumulada (W)</td>
+        <td style="padding: 12px;">{exergy_recuperada_anual:,.2f}</td>
+        <td style="padding: 12px;">{(exergy_recuperada_anual*2):,.2f}</td>
+        <td style="padding: 12px;">{(exergy_recuperada_anual*3):,.2f}</td>
+        <td style="padding: 12px;">{(exergy_recuperada_anual*4):,.2f}</td>
+        <td style="padding: 12px;">{(exergy_recuperada_anual*5):,.2f}</td>
+    </tr>
+    <tr style="border-bottom: 1px solid #222222; color: #4ade80; background-color: #0d1410;">
+        <td style="padding: 12px; font-weight: bold;">Índice de Inmunidad del Oikos ($S_e$)</td>
+        <td style="padding: 12px;">{soberania_exergetica:.2f}%</td>
+        <td style="padding: 12px;">{min(100.0, soberania_exergetica*1.05):.2f}%</td>
+        <td style="padding: 12px;">{min(100.0, soberania_exergetica*1.10):.2f}%</td>
+        <td style="padding: 12px;">{min(100.0, soberania_exergetica*1.15):.2f}%</td>
+        <td style="padding: 12px;">{min(100.0, soberania_exergetica*1.20):.2f}%</td>
+    </tr>
+</table>
+"""
+st.markdown(html_table, unsafe_allow_html=True)
+
+# ==========================================
+# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA
 # ==========================================
 st.markdown("---")
 st.header("⚙️ SISTEMA 3: Arbitraje de Inmunidad Operativa")
-st.markdown("*Asignación analítica de la potencia activa neta disponible para mitigar la entropía interna*")
 
 ac1, ac2, ac3 = st.columns(3)
 
 if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
     l_maint, l_assets = "🛡️ Vectorización NLP / Automatización (%):", "📈 Fondo Jurídico Indexado (%):"
 elif foco_metabolico == "Logística y Suministros (Termodinámica Comercial)":
-    l_maint, l_assets = "🛡️ Blindaje de Rutas e Infraestructura (%):", "📈 Activos Fijos y Amortización (%):"
+    l_maint, l_assets = "🛡️ Blindaje de Rutas e Infraestructura (%):", "📈 Activos Fijos (%):"
 elif foco_metabolico == "Coherencia de Carteras y Activos (Matriz Exergética Financiera)":
-    l_maint, l_assets = "🛡️ Cobertura contra Colas Pesadas (%):", "📈 Recalibración Estocástica de Portafolio (%):"
+    l_maint, l_assets = "🛡️ Cobertura contra Colas Pesadas (%):", "📈 Recalibración Estocástica (%):"
 else:
     l_maint, l_assets = "🛡️ Mantenimiento de Capital Fijo (%):", "📈 Reserva de Activos Reales (%):"
 
@@ -258,17 +323,17 @@ res_total = r_maint + r_assets + r_slack
 salida_libre = 100 - res_total
 
 if res_total > 90 or res_total < 10:
-    st.error(f"⚠️ CONFIGURACIÓN INVIABLE: La reserva consolidada ({res_total}%) rompe las fronteras de absorción del Sistema 3.")
+    st.error(f"⚠️ CONFIGURACIÓN INVIABLE: La reserva consolidada rompe las fronteras de absorción del Sistema 3.")
 else:
     nivel_sancion = 0
     motivo_sancion = "Coherencia algorítmica alineada con las reglas comunes de protección recíproca."
     
     if eficiencia_real < 75.0 and res_total < 35:
         nivel_sancion = 1
-        motivo_sancion = "Sanción Graduada G1: Eficiencia disipativa con reservas deficientes. Confiscación automática del 15% de Viabilidad Libre."
+        motivo_sancion = "Sanción Graduada G1: Confiscación automática del 15% de Viabilidad Libre para reyección de capital."
     if r_maint == 5 or r_assets == 5:
         nivel_sancion = 2
-        motivo_sancion = "Sanción Coercitiva G2: Intento de vaciado del fondo común. Veto algorítmico activo. Escritura denegada."
+        motivo_sancion = "Sanción Coercitiva G2: Veto algorítmico activo por desprotección del fondo común. Escritura bloqueada."
 
     p_maint = r_maint + 15.0 if nivel_sancion == 1 else r_maint
     p_salida = max(0.0, salida_libre - 15.0) if nivel_sancion == 1 else (0.0 if nivel_sancion == 2 else salida_libre)
@@ -304,7 +369,6 @@ else:
     elif nivel_sancion == 1: st.warning(f"⚖️ **Auditoría de Control:** {motivo_sancion}")
     else: st.error(f"⚖️ **🛡️ AUDITORÍA COERCITIVA ACTIVA:** {motivo_sancion}")
 
-    # Persistencia
     if st.button("💾 Sellar Matriz Exergética en la Memoria del Lógos"):
         if nivel_sancion == 2: st.error("Operación bloqueada por el Sistema 3.")
         elif db_disponible:
@@ -314,6 +378,28 @@ else:
                 st.success(f"Registro sellado inmutablemente para el nodo {nodo_id}.")
             except Exception as err: st.error(f"Falla de grabación: {err}")
         else: st.warning("Memoria local activa únicamente.")
+
+# ==========================================
+# SISTEMA 5: REGISTRO PSICOHISTÓRICO (HISTORIAL UPR)
+# ==========================================
+st.markdown("---")
+st.header("📡 SISTEMA 5: Registro Psicohistórico de la UPR")
+st.markdown("*Evolución temporal del vector de regeneración exergética frente a la disipación del entorno*")
+
+if db_disponible:
+    try:
+        cursor.execute("SELECT timestamp, (e_in - i_destroyed) as upr_net FROM exergy_history WHERE foco = %s ORDER BY timestamp ASC;", (foco_metabolico,))
+        rows = cursor.fetchall()
+        if rows:
+            import pandas as pd
+            chart_data = pd.DataFrame({
+                'Potencia UPR Neto (W-Neg)': [max(0.0, r[1]) for r in rows]
+            }, index=[r[0].strftime("%m-%d %H:%M") for r in rows])
+            st.line_chart(chart_data)
+        else:
+            st.info("A la espera de registros almacenados en el Lógos para trazar la línea evolutiva de la UPR.")
+    except Exception as graph_err:
+        st.sidebar.error(f"Fricción en el trazado psicohistórico: {graph_err}")
 
 st.sidebar.markdown("---")
 if not db_disponible: st.sidebar.warning("📡 Modo Autónomo Localizado Activo.")
