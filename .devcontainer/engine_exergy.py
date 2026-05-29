@@ -6,6 +6,14 @@ from datetime import datetime
 # VECTOR DE CONEXIÓN INMUTABLE (NEON)
 # ==========================================
 DB_URL = "postgresql://alexcejudo98:ep_dark_sound_p5p4wzrm@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
+try:
+    conn = psycopg2.connect(DB_URL)
+    # ...
+    db_disponible = True
+except Exception as e:
+    # Esto te dirá exactamente por qué falla: ¿Es el URL? ¿Es el firewall?
+    st.sidebar.error(f"DEBUG: Error de conexión: {str(e)}") 
+    db_disponible = False
 
 # ==========================================
 # PARÁMETROS BIOFÍSICOS E INFORMACIONALES (𝛽)
