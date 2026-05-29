@@ -137,12 +137,4 @@ st.sidebar.header("📡 SISTEMA 4: Radar de Entorno")
 if foco_metabolico == "Producción Industrial (UPR)":
     st.sidebar.markdown("*Monitoreo de perturbaciones exógenas de la infraestructura física (2020-2026)*")
     var_ext_1 = st.sidebar.slider("Riesgo de Choque Arancelario T-MEC (%):", 0, 100, 35)
-    var_ext_2 = st.sidebar.slider("Índice de Canibalización por Insumo Asiático (%):", 0, 100, 50)
-    var_ext_3 = st.sidebar.slider("Estrés de Capacidad Energética (Red CFE %):", 0, 100, 20)
-    lambda_entorno = 1.0 + ((var_ext_1 + var_ext_2 + var_ext_3) / 300.0)
-
-elif foco_metabolico == "Logística y Suministros (Termodinámica Comercial)":
-    st.sidebar.markdown("*Monitoreo de latencia y estrangulamiento en redes de distribución*")
-    var_ext_1 = st.sidebar.slider("Latencia en Puertos y Tráfico CDMX (%):", 0, 100, 40)
-    var_ext_2 = st.sidebar.slider("Inflación y Volatilidad de Suministros (%):", 0, 100, 25)
-    var_ext_3 = st.sidebar.slider("Cuellos de
+    var_ext_2 = st.sidebar.slider
