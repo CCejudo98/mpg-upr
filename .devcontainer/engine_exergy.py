@@ -326,48 +326,66 @@ impacto_fiscal_porcentaje = (monto_fiscal / excedente_neto * 100) if excedente_n
 res_total = r_maint + r_assets + impacto_fiscal_porcentaje
 salida_libre = max(0, 100 - res_total)
 
-if res_total > 95:
-    # 1. Primero, definimos la auditoría
-UMBRAL_FISCAL_CRITICO = 0.40 
-bloqueo_auditoria = (directiva_fiscal_externa > (excedente_neto * UMBRAL_FISCAL_CRITICO))
+# 1. Validación de Viabilidad Estructural
+    if res_total > 95:
+        st.error("⚠️ ALERTA DE SISTEMA: La directiva fiscal externa + ajustes operativos superan la viabilidad del nodo.")
+        bloqueo_auditoria = True
+    else:
+        # 2. Auditoría de Soberanía Fiscal
+        UMBRAL_FISCAL_CRITICO = 0.40
+        directiva_fiscal_externa = obtener_directiva_cliente(foco_metabolico)
+        
+        if directiva_fiscal_externa > (excedente_neto * UMBRAL_FISCAL_CRITICO):
+            st.error(f"🚨 ALERTA DE AUDITORÍA: La directiva fiscal (${directiva_fiscal_externa:,.2f}) excede el umbral de soberanía del 40%.")
+            bloqueo_auditoria = True
+        else:
+            bloqueo_auditoria = False
 
-# 2. Luego, validamos la integridad estructural
-if res_total > 95:
-    st.error("⚠️ ALERTA DE SISTEMA: La directiva fiscal externa + ajustes operativos superan la viabilidad del nodo.")
-    bloqueo_auditoria = True # Si el sistema es inviable, bloqueamos por defecto
+        # 3. Cálculo de Potencia (Solo si el sistema es viable y auditable)
+        nivel_sancion = 0
+        motivo_sancion = "Coherencia algorítmica alineada con la soberanía del Oikos."
+        
+        if eficiencia_real < 75.0 and res_total < 35:
+            nivel_sancion = 1
+            motivo_sancion = "Sanción G1: Confiscación del 15% de Viabilidad para reyección."
+        
+        p_maint = r_maint + (15.0 if nivel_sancion == 1 else 0)
+        p_salida = max(0.0, salida_libre - (15.0 if nivel_sancion == 1 else 0))
 
-# 3. Finalmente, mostramos la alerta de auditoría si aplica
-if bloqueo_auditoria:
-    st.error(f"🚨 ALERTA DE AUDITORÍA: La directiva fiscal (${directiva_fiscal_externa:,.2f}) excede los límites de soberanía.")
+        st.subheader("📊 Distribución de Potencia Activa Final")
+        
+        def estilo_noire_puro(p, veto=False):
+            if veto: return "background-color: #2a0a0a; color: #ff5555; border: 1px dashed #ff0000;"
+            return "background-color: #0c140e; color: #4ade80; border: 1px solid #14532d;"
 
-# 4. Y el botón queda subordinado a este estado
-if st.button("💾 Validar y Sellar Auditoría"):
-    if bloqueo_auditoria:
-        st.error("❌ Operación denegada por protocolo de seguridad.")
-else:
-    st.subheader("📊 Monitoreo de Potencia: Directiva Cliente vs Auditoría")
-    
-    def estilo_noire_auditoria(val, es_fiscal=False):
-        if es_fiscal: return "background-color: #1c180c; color: #facc15; border: 1px solid #713f12;"
-        return "background-color: #0c140e; color: #4ade80; border: 1px solid #14532d;"
+        dc1, dc2, dc3, dc4, dc5 = st.columns(5)
+        # Nota: aquí incluimos la directiva fiscal externa en la visualización
+        data_display = [
+            ("Mantenimiento", excedente_neto*(p_maint/100)),
+            ("Activos", excedente_neto*(r_assets/100)),
+            ("Directiva Fiscal", directiva_fiscal_externa),
+            ("Holgura", excedente_neto*(r_slack/100)),
+            ("Viabilidad", excedente_neto*(p_salida/100))
+        ]
 
-    dc1, dc2, dc3, dc4 = st.columns(4)
-    datos = [
-        ("Mantenimiento", excedente_neto*(r_maint/100)),
-        ("Activos", excedente_neto*(r_assets/100)),
-        ("Directiva Fiscal", monto_fiscal),
-        ("Viabilidad", excedente_neto*(salida_libre/100))
-    ]
+        for col, (t, val) in zip([dc1, dc2, dc3, dc4, dc5], data_display):
+            with col:
+                st.markdown(f"""<div style="{estilo_noire_puro(val)} padding: 10px; border-radius: 4px; text-align: center;">
+                    <p style='font-size: 9px; margin:0;'>{t.upper()}</p>
+                    <p style='font-size: 14px; font-weight: bold; margin:0;'>{val:,.0f}W</p>
+                </div>""", unsafe_allow_html=True)
 
-    for col, (t, val) in zip([dc1, dc2, dc3, dc4], datos):
-        with col:
-            st.markdown(f"""<div style="{estilo_noire_auditoria(val, es_fiscal=(t=='Directiva Fiscal'))} padding: 10px; border-radius: 4px; text-align: center;">
-                <p style='font-size: 9px; margin:0;'>{t.upper()}</p>
-                <p style='font-size: 14px; font-weight: bold; margin:0;'>{val:,.0f}W</p>
-            </div>""", unsafe_allow_html=True)
-
-    if st.button("💾 Validar y Sellar Auditoría"):
-        st.success(f"Auditoría completada para el foco {foco_metabolico}. Directiva del cliente confirmada.")
+        # 4. Acción de Sellado Auditado
+        if st.button("💾 Validar y Sellar Auditoría"):
+            if bloqueo_auditoria:
+                st.error("❌ Operación denegada por protocolo de seguridad.")
+            elif db_disponible:
+                try:
+                    cursor.execute("INSERT INTO exergy_history (foco, e_in, i_destroyed, efficiency) VALUES (%s, %s, %s, %s);", 
+                                   (foco_metabolico, e_in_real, i_destroyed, eficiencia_real))
+                    conn.commit()
+                    st.success("✅ Auditoría completada y sellada en el Lógos.")
+                except Exception as err: st.error(f"Falla de grabación: {err}")
 # ==========================================
 # SISTEMA 5: REGISTRO PSICOHISTÓRICO (HISTORIAL UPR)
 # ==========================================
