@@ -5,33 +5,7 @@ from datetime import datetime
 # ==========================================
 # VECTOR DE CONEXIÓN CORREGIDO Y VERIFICADO
 # ==========================================
-db_disponible = False
-conn = None
-cursor = None
-
-try:
-    conn = psycopg2.connect(DB_URL)
-    cursor = conn.cursor()
-    # Verificamos si la tabla existe en el esquema 'public'
-    cursor.execute("""
-        SELECT EXISTS (
-            SELECT FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            AND table_name = 'public_fiscal_stats'
-        );
-    """)
-    existe = cursor.fetchone()[0]
-    
-    if existe:
-        db_disponible = True
-        st.sidebar.success("📡 Sincronización con Lógos activa.")
-    else:
-        st.sidebar.error("⚠️ Lógos detectado, pero la tabla 'public_fiscal_stats' no existe.")
-        db_disponible = False
-        
-except Exception as e:
-    st.sidebar.error(f"Fricción de enlace: {e}")
-    db_disponible = False
+DB_URL = "postgresql://alexcejudo98:npg_lUXzKcHe84Df@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
 # ==========================================
 # PARÁMETROS BIOFÍSICOS E INFORMACIONALES (𝛽)
