@@ -327,7 +327,23 @@ res_total = r_maint + r_assets + impacto_fiscal_porcentaje
 salida_libre = max(0, 100 - res_total)
 
 if res_total > 95:
+    # 1. Primero, definimos la auditoría
+UMBRAL_FISCAL_CRITICO = 0.40 
+bloqueo_auditoria = (directiva_fiscal_externa > (excedente_neto * UMBRAL_FISCAL_CRITICO))
+
+# 2. Luego, validamos la integridad estructural
+if res_total > 95:
     st.error("⚠️ ALERTA DE SISTEMA: La directiva fiscal externa + ajustes operativos superan la viabilidad del nodo.")
+    bloqueo_auditoria = True # Si el sistema es inviable, bloqueamos por defecto
+
+# 3. Finalmente, mostramos la alerta de auditoría si aplica
+if bloqueo_auditoria:
+    st.error(f"🚨 ALERTA DE AUDITORÍA: La directiva fiscal (${directiva_fiscal_externa:,.2f}) excede los límites de soberanía.")
+
+# 4. Y el botón queda subordinado a este estado
+if st.button("💾 Validar y Sellar Auditoría"):
+    if bloqueo_auditoria:
+        st.error("❌ Operación denegada por protocolo de seguridad.")
 else:
     st.subheader("📊 Monitoreo de Potencia: Directiva Cliente vs Auditoría")
     
