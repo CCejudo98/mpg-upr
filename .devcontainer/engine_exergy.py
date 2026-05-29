@@ -296,88 +296,79 @@ html_table = f"""
 """
 st.markdown(html_table, unsafe_allow_html=True)
 
-# ==========================================
-# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA
-# ==========================================
+# =================================================================
+# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA Y FILTRO FISCAL
+# =================================================================
 st.markdown("---")
 st.header("⚙️ SISTEMA 3: Arbitraje de Inmunidad Operativa")
 
 ac1, ac2, ac3 = st.columns(3)
 
 if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)":
-    l_maint, l_assets = "🛡️ Vectorización NLP / Automatización (%):", "📈 Fondo Jurídico Indexado (%):"
+    l_maint, l_assets = "🛡️ Vectorización NLP (%):", "📈 Fondo Jurídico (%):"
 elif foco_metabolico == "Logística y Suministros (Termodinámica Comercial)":
-    l_maint, l_assets = "🛡️ Blindaje de Rutas e Infraestructura (%):", "📈 Activos Fijos (%):"
+    l_maint, l_assets = "🛡️ Blindaje Rutas (%):", "📈 Activos Fijos (%):"
 elif foco_metabolico == "Coherencia de Carteras y Activos (Matriz Exergética Financiera)":
-    l_maint, l_assets = "🛡️ Cobertura contra Colas Pesadas (%):", "📈 Recalibración Estocástica (%):"
+    l_maint, l_assets = "🛡️ Cobertura Colas (%):", "📈 Recalibración (%):"
 else:
-    l_maint, l_assets = "🛡️ Mantenimiento de Capital Fijo (%):", "📈 Reserva de Activos Reales (%):"
+    l_maint, l_assets = "🛡️ Mantenimiento (%):", "📈 Activos Reales (%):"
 
-l_slack = "🌪️ Holgura / Amortiguación Homeostática (%):"
+l_slack = "🌪️ Holgura Homeostática (%):"
+l_fiscal = "💰 Reinversión Fiscal (Ded.):"
 
-with ac1: r_maint = st.slider(l_maint, min_value=5, max_value=40, value=15, step=1)
-with ac2: r_assets = st.slider(l_assets, min_value=5, max_value=40, value=15, step=1)
-with ac3: r_slack = st.slider(l_slack, min_value=0, max_value=20, value=10, step=1)
+with ac1: 
+    r_maint = st.slider(l_maint, 5, 40, 15)
+    r_fiscal = st.slider(l_fiscal, 0, 40, 10) # Nueva variable fiscal
+with ac2: r_assets = st.slider(l_assets, 5, 40, 15)
+with ac3: r_slack = st.slider(l_slack, 0, 20, 10)
 
-res_total = r_maint + r_assets + r_slack
-salida_libre = 100 - res_total
+res_total = r_maint + r_assets + r_slack + r_fiscal
+salida_libre = max(0, 100 - res_total)
 
-if res_total > 90 or res_total < 10:
-    st.error(f"⚠️ CONFIGURACIÓN INVIABLE: La reserva consolidada rompe las fronteras de absorción del Sistema 3.")
+if res_total > 95:
+    st.error("⚠️ CONFIGURACIÓN INVIABLE: La carga estructural supera la capacidad del nodo.")
 else:
     nivel_sancion = 0
-    motivo_sancion = "Coherencia algorítmica alineada con las reglas comunes de protección recíproca."
+    motivo_sancion = "Coherencia algorítmica alineada con la soberanía del Oikos."
     
     if eficiencia_real < 75.0 and res_total < 35:
         nivel_sancion = 1
-        motivo_sancion = "Sanción Graduada G1: Confiscación automática del 15% de Viabilidad Libre para reyección de capital."
-    if r_maint == 5 or r_assets == 5:
-        nivel_sancion = 2
-        motivo_sancion = "Sanción Coercitiva G2: Veto algorítmico activo por desprotección del fondo común. Escritura bloqueada."
-
-    p_maint = r_maint + 15.0 if nivel_sancion == 1 else r_maint
-    p_salida = max(0.0, salida_libre - 15.0) if nivel_sancion == 1 else (0.0 if nivel_sancion == 2 else salida_libre)
+        motivo_sancion = "Sanción G1: Confiscación del 15% de Viabilidad para reyección."
+    
+    p_maint = r_maint + (15.0 if nivel_sancion == 1 else 0)
+    p_salida = max(0.0, salida_libre - (15.0 if nivel_sancion == 1 else 0))
 
     st.subheader("📊 Distribución de Potencia Activa Final")
     
-    def estilo_noire_puro(p, min_o, max_o, veto=False):
+    def estilo_noire_puro(p, veto=False):
         if veto: return "background-color: #2a0a0a; color: #ff5555; border: 1px dashed #ff0000;"
-        if p < min_o: return "background-color: #1a0808; color: #ff6b6b; border: 1px solid #500;"
-        elif p <= max_o: return "background-color: #0c140e; color: #4ade80; border: 1px solid #14532d;"
-        else: return "background-color: #1c180c; color: #facc15; border: 1px solid #713f12;"
+        return "background-color: #0c140e; color: #4ade80; border: 1px solid #14532d;"
 
-    e_m = estilo_noire_puro(p_maint, 15, 30, veto=(nivel_sancion == 1))
-    e_a = estilo_noire_puro(r_assets, 15, 30)
-    e_s = estilo_noire_puro(r_slack, 5, 15)
-    e_o = "background-color: #111; color: #fff; border: 1px solid #333;" if nivel_sancion < 2 else "background-color: #3a0000; color: #ff0000; border: 2px solid #ff0000;"
+    dc1, dc2, dc3, dc4, dc5 = st.columns(5)
+    data_display = [
+        ("Mantenimiento", excedente_neto*(p_maint/100)),
+        ("Activos", excedente_neto*(r_assets/100)),
+        ("Fiscal/Ded", excedente_neto*(r_fiscal/100)),
+        ("Holgura", excedente_neto*(r_slack/100)),
+        ("Viabilidad", excedente_neto*(p_salida/100))
+    ]
 
-    dc1, dc2, dc3, dc4 = st.columns(4)
-    t1 = "NLP Regulatorio" if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)" else ("Blindaje Rutas" if foco_metabolico == "Logística y Suministros (Termodinámica Comercial)" else ("Blindaje Portafolio" if foco_metabolico == "Coherencia de Carteras y Activos (Matriz Exergética Financiera)" else "Mantenimiento"))
-    t2 = "Fondo Indexado" if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)" else "Reserva Activos"
-    t3 = "Cobertura GAFI" if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)" else "Holgura Operativa"
-    t4 = "Viabilidad Libre" if foco_metabolico == "Riesgo Regulatorio y Compliance (Motor de Fragilidad)" else "Salida Útil Real"
-
-    for col, t, val, est in zip([dc1, dc2, dc3, dc4], [t1, t2, t3, t4], [excedente_neto*(p_maint/100), excedente_neto*(r_assets/100), excedente_neto*(r_slack/100), excedente_neto*(p_salida/100)], [e_m, e_a, e_s, e_o]):
+    for col, (t, val) in zip([dc1, dc2, dc3, dc4, dc5], data_display):
         with col:
-            st.markdown(f"""<div style="{est} padding: 25px; border-radius: 4px; text-align: center;">
-                <h4 style='margin: 0; text-transform: uppercase; font-size: 11px; letter-spacing: 2px; opacity: 0.7;'>{t}</h4>
-                <p style='font-size: 24px; font-family: monospace; font-weight: bold; margin: 15px 0;'>{val:,.2f} W</p>
+            st.markdown(f"""<div style="{estilo_noire_puro(val)} padding: 10px; border-radius: 4px; text-align: center;">
+                <p style='font-size: 9px; margin:0;'>{t.upper()}</p>
+                <p style='font-size: 14px; font-weight: bold; margin:0;'>{val:,.0f}W</p>
             </div>""", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
-    if nivel_sancion == 0: st.info(f"⚖️ **Auditoría de Control:** {motivo_sancion}")
-    elif nivel_sancion == 1: st.warning(f"⚖️ **Auditoría de Control:** {motivo_sancion}")
-    else: st.error(f"⚖️ **🛡️ AUDITORÍA COERCITIVA ACTIVA:** {motivo_sancion}")
-
-    if st.button("💾 Sellar Matriz Exergética en la Memoria del Lógos"):
-        if nivel_sancion == 2: st.error("Operación bloqueada por el Sistema 3.")
-        elif db_disponible:
+    if st.button("💾 Sellar Matriz Exergética y Registro Fiscal"):
+        if db_disponible:
             try:
-                cursor.execute("INSERT INTO exergy_history (foco, e_in, i_destroyed, efficiency) VALUES (%s, %s, %s, %s);", (foco_metabolico, e_in_real, i_destroyed, eficiencia_real))
+                # Nota: Asegúrate de que tu tabla en Neon tenga estas columnas si deseas persistir la parte fiscal
+                cursor.execute("""INSERT INTO exergy_history (foco, e_in, i_destroyed, efficiency) 
+                                  VALUES (%s, %s, %s, %s);""", (foco_metabolico, e_in_real, i_destroyed, eficiencia_real))
                 conn.commit()
-                st.success(f"Registro sellado inmutablemente para el nodo {nodo_id}.")
-            except Exception as err: st.error(f"Falla de grabación: {err}")
-        else: st.warning("Memoria local activa únicamente.")
+                st.success("Estado sellado. Reinversión fiscal registrada en el Lógos.")
+            except Exception as err: st.error(f"Error en Lógos: {err}")
 
 # ==========================================
 # SISTEMA 5: REGISTRO PSICOHISTÓRICO (HISTORIAL UPR)
