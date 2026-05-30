@@ -5,7 +5,17 @@ from datetime import datetime
 # ==========================================
 # VECTOR DE CONEXIÓN CORREGIDO Y VERIFICADO
 # ==========================================
-DB_URL = "postgresql://neondb_owner:npg_4IuJofqBpE3v@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
+# 1. Asegúrate de usar la contraseña que acabas de generar en Neon
+DB_PASS = ""
+DB_URL = f"postgresql://alexcejudo98:{DB_PASS}@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
+
+# 2. Conexión con manejo de errores limpio
+try:
+    conn = psycopg2.connect(DB_URL)
+    st.sidebar.success("📡 ¡Soberanía de datos restaurada!")
+    # ... resto de tu código
+except Exception as e:
+    st.sidebar.error(f"Fricción crítica: {e}")
 # ==========================================
 # PARÁMETROS BIOFÍSICOS E INFORMACIONALES (𝛽)
 # ==========================================
@@ -295,16 +305,16 @@ html_table = f"""
 """
 st.markdown(html_table, unsafe_allow_html=True)
 
-
 # ==========================================
-# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA (AUDITORÍA FISCAL)
+# SISTEMA 3: ARBITRAJE DE INMUNIDAD OPERATIVA (REFACTOREADO)
 # ==========================================
 st.markdown("---")
 st.header("⚙️ SISTEMA 3: Auditoría de Directiva Fiscal Externa")
 
 def obtener_directiva_cliente(foco):
     if db_disponible:
-        cursor.execute("SELECT fiscal_investment FROM public_fiscal_stats WHERE foco = %s ORDER BY timestamp DESC LIMIT 1", (foco,))
+        # CORRECCIÓN: Ajustado a tu estructura real de datos en upr_metabolic_flux
+        cursor.execute("SELECT tasa_retencion_neto FROM upr_metabolic_flux WHERE nombre_empresa = %s ORDER BY timestamp_sat DESC LIMIT 1", (foco,))
         res = cursor.fetchone()
         return res[0] if res else 0.0
     return 0.0
@@ -313,6 +323,7 @@ ac1, ac2 = st.columns(2)
 with ac1: r_maint = st.slider("🛡️ Ajuste Auditoría (Mantenimiento):", 5, 40, 15)
 with ac2: r_assets = st.slider("📈 Ajuste Auditoría (Activos):", 5, 40, 15)
 
+# Asegurar que excedente_neto esté definido (si no, inicialízalo según tu lógica original)
 directiva_fiscal_externa = obtener_directiva_cliente(foco_metabolico)
 impacto_fiscal_porcentaje = (directiva_fiscal_externa / excedente_neto * 100) if excedente_neto > 0 else 0
 res_total = r_maint + r_assets + impacto_fiscal_porcentaje
@@ -325,7 +336,7 @@ if res_total > 95:
 else:
     UMBRAL_FISCAL_CRITICO = 0.40
     if directiva_fiscal_externa > (excedente_neto * UMBRAL_FISCAL_CRITICO):
-        st.error(f"🚨 ALERTA DE AUDITORÍA: La directiva (${directiva_fiscal_externa:,.2f}) excede el umbral de soberanía.")
+        st.error(f"🚨 ALERTA DE AUDITORÍA: La directiva (${directiva_fiscal_externa:,.2f}) excede el umbral.")
         bloqueo_auditoria = True
 
 if not bloqueo_auditoria:
@@ -338,10 +349,13 @@ if not bloqueo_auditoria:
             
     if st.button("💾 Validar y Sellar Auditoría"):
         if db_disponible:
-            cursor.execute("INSERT INTO exergy_history (foco, e_in, i_destroyed, efficiency) VALUES (%s, %s, %s, %s);", (foco_metabolico, e_in_real, i_destroyed, eficiencia_real))
+            # CORRECCIÓN: INSERT ajustado al nombre real de tu tabla y columnas
+            cursor.execute("""
+                INSERT INTO upr_metabolic_flux (nombre_empresa, e_ex_in_watts, e_ex_out_entropy, tasa_retencion_neto) 
+                VALUES (%s, %s, %s, %s);
+            """, (foco_metabolico, e_in_real, i_destroyed, eficiencia_real))
             conn.commit()
-            st.success("✅ Auditoría completada.")
-
+            st.success("✅ Auditoría sellada en el Lógos.")
 # ==========================================
 # SISTEMA 5: REGISTRO PSICOHISTÓRICO (HISTORIAL UPR)
 # ==========================================
