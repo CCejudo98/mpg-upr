@@ -5,7 +5,7 @@ from datetime import datetime
 # ==========================================
 # VECTOR DE CONEXIÓN INMUTABLE (NEON)
 # ==========================================
-DB_URL ="postgresql://neondb_owner:npg_4IuJofqBpE3v@ep-patient-pine-apfibhxx-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+postgresql://neondb_owner:npg_4IuJofqBpE3v@ep-patient-pine-apfibhxx-pooler.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
 
 # ==========================================
 # EQUIVALENCIAS DE COSTO Y EFICIENCIA (𝛽)
