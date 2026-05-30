@@ -330,16 +330,19 @@ res_total = r_maint + r_assets + impacto_fiscal_porcentaje
 r_slack = max(0, 100 - res_total)
 
 bloqueo_auditoria = False
+# === INICIO DE BLOQUE DE SINTAXIS SANEADA ===
 if res_total > 95:
     st.error("⚠️ ALERTA DE SISTEMA: La carga estructural supera la viabilidad del nodo.")
     bloqueo_auditoria = True
 else:
     UMBRAL_FISCAL_CRITICO = 0.40
+    directiva_fiscal_externa = obtener_directiva_cliente(foco_metabolico)
     if directiva_fiscal_externa > (excedente_neto * UMBRAL_FISCAL_CRITICO):
         st.error(f"🚨 ALERTA DE AUDITORÍA: La directiva (${directiva_fiscal_externa:,.2f}) excede el umbral.")
         bloqueo_auditoria = True
-
-if not bloqueo_auditoria:
+    else:
+        bloqueo_auditoria = False
+# === FIN DE BLOQUE DE SINTAXIS SANEADA ===
     dc1, dc2, dc3, dc4, dc5 = st.columns(5)
     data_display = [("Mantenimiento", excedente_neto*(r_maint/100)), ("Activos", excedente_neto*(r_assets/100)), ("Directiva Fiscal", directiva_fiscal_externa), ("Holgura", excedente_neto*(r_slack/100)), ("Viabilidad", excedente_neto*(max(0, 100-res_total)/100))]
     
