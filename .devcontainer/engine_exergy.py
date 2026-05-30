@@ -5,8 +5,7 @@ from datetime import datetime
 # ==========================================
 # VECTOR DE CONEXIÓN CORREGIDO Y VERIFICADO
 # ==========================================
-DB_URL = "postgresql://alexcejudo98:npg_lUXzKcHe84Df@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
-
+DB_URL = "postgresql://neondb_owner:npg_lUXzKcHe84Df@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
 # ==========================================
 # PARÁMETROS BIOFÍSICOS E INFORMACIONALES (𝛽)
 # ==========================================
