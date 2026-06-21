@@ -66,5 +66,85 @@ def simular_sistema_transductivo(potencia_inicial, factor_retroalimentacion, cap
     return potencias
 
 if st.button("⚡ Ejecutar Proyección Dinámica del Nodo"):
-    trayectoria = simular_sistema_transductivo(excedente_neto, 0.5, e_in_real * 1.5)
-    st.line_chart(pd.DataFrame({"Potencia Proyectada (W)": trayectoria}))
+   # ==========================================
+# SIMULADOR LOGÍSTICO NO LINEAL (SISTEMA 4)
+# ==========================================
+def simular_sistema_transductivo(potencia_inicial, factor_retroalimentacion, capacidad_medio, ciclos=30):
+    x = potencia_inicial
+    potencias = []
+    aceleraciones = []
+    estados = []
+    
+    for ciclo in range(1, ciclos + 1):
+        variacion = factor_retroalimentacion * x * (1 - (x / capacidad_medio))
+        x_siguiente = x + variacion
+        
+        if ciclo == 1:
+            aceleracion = 0.0
+        else:
+            aceleracion = (x_siguiente - x) - (potencias[-1] - (potencias[-2] if len(potencias) > 1 else potencia_inicial))
+            
+        potencias.append(x_siguiente)
+        aceleraciones.append(aceleracion)
+        
+        if x_siguiente >= capacidad_medio * 0.95:
+            estado = "💥 Saturación Metaestable"
+        elif aceleracion > 0.01:
+            estado = "⚡ Aceleración Expansiva"
+        else:
+            estado = "🌱 Acumulación Homeostática"
+        estados.append(estado)
+        
+        if abs(x_siguiente - x) < 1e-6 and ciclo > 10:
+            break
+        x = x_siguiente
+        
+    return potencias, aceleraciones, estados
+
+# Parámetros cinéticos expuestos para el control del operador
+st.markdown("### 🎛️ Parámetros de Control Cinético")
+sc1, sc2, sc3 = st.columns(3)
+with sc1:
+    p_init = st.number_input("Masa Crítica Inicial ($x_0$):", min_value=1.0, value=max(1.0, excedente_neto))
+with sc2:
+    f_retro = st.slider("Retroalimentación Sintrópica ($r$):", 0.01, 3.0, 0.5)
+with sc3:
+    cap_medio = st.number_input("Límite de Capacidad del Entorno ($K$):", min_value=10.0, value=max(100.0, e_in_real * 1.5))
+
+# EJECUCIÓN CONTINUA DE LA TRAYECTORIA (Evita que la pantalla quede vacía)
+potencias, aceleraciones, estados = simular_sistema_transductivo(p_init, f_retro, cap_medio)
+
+df_simulacion = pd.DataFrame({
+    "Potencia Proyectada (W)": potencias,
+    "Aceleración Cinética": aceleraciones
+})
+
+# PANEL DE RESULTADOS SIEMPRE VISIBLE
+st.markdown("---")
+st.subheader("🔮 Proyección Dinámica y Puntos de Quiebre del Nodo")
+
+rc1, rc2, rc3 = st.columns(3)
+with rc1:
+    st.metric("Ciclos hasta Atractor/Saturación", len(df_simulacion))
+with rc2:
+    st.metric("Potencia Terminal Convergente", f"{potencias[-1]:,.2f} W")
+with rc3:
+    st.metric("Régimen de Salida", estados[-1])
+
+# RENDERIZADO GRÁFICO AUTOMÁTICO
+st.subheader("Evolución de la Masa Exergética Proyectada")
+st.line_chart(df_simulacion[["Potencia Proyectada (W)"]])
+
+st.subheader("Fuerza de Aceleración Interna (Segunda Derivada Discreta)")
+st.area_chart(df_simulacion[["Aceleración Cinética"]])
+
+# ALERTAS ONTOLÓGICAS
+if "💥 Saturación Metaestable" in estados:
+    st.warning("⚠️ CRÍTICO: La trayectoria proyectada colisionará con la finitud del entorno ($K$). Expansión de la variedad de Ashby requerida.")
+else:
+    st.success("💎 Homeostasis de largo plazo asegurada. El acoplamiento con el entorno es armónico.")
+
+# BOTÓN DE REFRESCO SOBERANO (Opcional, para forzar el recálculo)
+st.sidebar.markdown("---")
+if st.sidebar.button("🔄 Recalibrar Matrices del Core"):
+    st.rerun()
