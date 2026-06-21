@@ -6,7 +6,6 @@ import pandas as pd
 # ==========================================
 # VECTOR DE CONEXIÓN CORREGIDO Y VERIFICADO
 # ==========================================
-# Se recomienda migrar a st.secrets["postgres"]["db_url"] en producción
 DB_PASS = "npg_4IuJofqBpE3v"  # Recuperado de tu vector inmutable anterior
 DB_URL = f"postgresql://alexcejudo98:{DB_PASS}@ep-dark-sound-a5x836m4.us-east-2.aws.neon.tech/neondb?sslmode=require"
 
@@ -80,7 +79,6 @@ cursor = None
 try:
     conn = psycopg2.connect(DB_URL)
     cursor = conn.cursor()
-    # Tabla unificada para evitar el quiebre de consistencia
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS exergy_history (
             id SERIAL PRIMARY KEY,
@@ -117,7 +115,7 @@ foco_metabolico = st.radio(
         "Coherencia de Carteras y Activos (Matriz Exergética Financiera)"
     ],
     horizontal=True,
-    key="foco_actual" # Vinculación explícita al estado de la sesión
+    key="foco_actual"
 )
 
 # ==========================================
@@ -307,13 +305,12 @@ st.markdown(html_table, unsafe_allow_html=True)
 st.markdown("---")
 st.header("⚙️ SISTEMA 3: Auditoría de Directiva Fiscal Externa")
 
-# Simulación local en caso de ausencia de datos para evitar caídas
 def obtener_directiva_cliente(foco):
     if db_disponible:
         try:
             cursor.execute("SELECT i_destroyed FROM exergy_history WHERE foco = %s ORDER BY timestamp DESC LIMIT 1", (foco,))
             res = cursor.fetchone()
-            return res[0] * 0.15 if res else 1500.0 # Proporción fiscal de juguete simétrica
+            return res[0] * 0.15 if res else 1500.0 
         except:
             return 1500.0
     return 1500.0
@@ -340,7 +337,6 @@ else:
     else:
         bloqueo_auditoria = False
 
-# === CORRECCIÓN DE IDENTACIÓN: Al ras del flujo principal ===
 dc1, dc2, dc3, dc4, dc5 = st.columns(5)
 data_display = [
     ("Mantenimiento", excedente_neto*(r_maint/100)), 
@@ -357,7 +353,6 @@ for col, (t, val) in zip([dc1, dc2, dc3, dc4, dc5], data_display):
 if st.button("💾 Validar y Sellar Auditoría"):
     if not bloqueo_auditoria and db_disponible:
         try:
-            # CORRECCIÓN: Escritura síncrona en la tabla unificada exergy_history
             cursor.execute("""
                 INSERT INTO exergy_history (foco, e_in, i_destroyed, efficiency) 
                 VALUES (%s, %s, %s, %s);
@@ -369,6 +364,88 @@ if st.button("💾 Validar y Sellar Auditoría"):
             st.error(f"Fricción de escritura: {insert_err}")
     elif bloqueo_auditoria:
         st.error("❌ Acción bloqueada: Resuelva la violación del umbral metabólico antes de sellar.")
+
+
+# ==========================================
+# INSERCIÓN INTERMETÁLICA: NUEVO MOTOR SIMULADOR
+# ==========================================
+def simular_sistema_transductivo(potencia_inicial, factor_retroalimentacion, capacidad_medio, ciclos=50):
+    x = potencia_inicial
+    potencias_historicas = []
+    aceleraciones_historicas = []
+    estados_historicos = []
+
+    for ciclo in range(1, ciclos + 1):
+        variacion = factor_retroalimentacion * x * (1 - (x / capacidad_medio))
+        x_siguiente = x + variacion
+
+        if ciclo == 1:
+            aceleracion = 0.0
+        else:
+            aceleracion_actual_paso = (x_siguiente - x)
+            aceleracion_paso_anterior = potencias_historicas[-1] - (potencias_historicas[-2] if len(potencias_historicas) > 1 else potencia_inicial)
+            aceleracion = aceleracion_actual_paso - aceleracion_paso_anterior
+
+        potencias_historicas.append(x_siguiente)
+        aceleraciones_historicas.append(aceleracion)
+
+        if x_siguiente >= capacidad_medio * 0.95:
+            estado = "💥 Saturación Metaestable"
+        elif aceleracion > 0.01:
+            estado = "⚡ Aceleración Expansiva"
+        else:
+            estado = "🌱 Acumulación Homeostática"
+        estados_historicos.append(estado)
+
+        if abs(x_siguiente - x) < 1e-6 and ciclo > 10:
+            break
+
+        x = x_siguiente
+
+    return potencias_historicas, aceleraciones_historicas, estados_historicos
+
+st.markdown("---")
+st.header("🔮 SISTEMA 4: Simulador de Trayectorias Transductivas y Puntos de Quiebre")
+st.markdown("*Modelado predictivo de acumulación de potencia frente a límites biofísicos del entorno ($K$)*")
+
+sc1, sc2, sc3 = st.columns(3)
+with sc1:
+    p_init = st.number_input("Densidad Inicial de Potencia ($x_0$):", min_value=1.0, value=max(1.0, e_in_real * 0.1))
+with sc2:
+    f_retro = st.slider("Factor de Retroalimentación Sintrópica ($r$):", 0.01, 3.0, max(0.1, 2.0 - lambda_entorno))
+with sc3:
+    cap_medio = st.number_input("Capacidad de Saturación del Medio ($K$):", min_value=10.0, value=max(100.0, e_in_real * 1.5))
+
+if st.button("⚡ Ejecutar Proyección Dinámica del Nodo"):
+    potencias, aceleraciones, estados = simular_sistema_transductivo(
+        potencia_inicial=p_init, 
+        factor_retroalimentacion=f_retro, 
+        capacidad_medio=cap_medio
+    )
+    
+    df_simulacion = pd.DataFrame({
+        "Potencia del Sistema (W)": potencias,
+        "Aceleración Cinética": aceleraciones,
+        "Régimen": estados
+    })
+    
+    rc1, rc2 = st.columns(2)
+    with rc1:
+        st.metric("Ciclos para Estabilización / Quiebre", len(df_simulacion))
+    with rc2:
+        st.metric("Potencia Terminal Convergente", f"{potencias[-1]:,.2f} W")
+        
+    st.subheader("Evolución de la Masa Exergética Proyectada")
+    st.line_chart(df_simulacion[["Potencia del Sistema (W)"]])
+    
+    st.subheader("Segunda Derivada Discreta (Fuerza de Aceleración Interna)")
+    st.area_chart(df_simulacion[["Aceleración Cinética"]])
+    
+    if "💥 Saturación Metaestable" in estados:
+        st.warning("⚠️ El sistema colisionará con la finitud de su entorno ($K$). Se requiere expansión de la variedad de Ashby de forma inmediata.")
+    else:
+        st.success("💎 Homeostasis predictiva asegurada. El sistema coevoluciona armónicamente con la capacidad del medio.")
+
 
 # ==========================================
 # SISTEMA 5: REGISTRO PSICOHISTÓRICO (HISTORIAL UPR)
