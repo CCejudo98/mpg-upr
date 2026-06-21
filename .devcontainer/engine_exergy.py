@@ -57,7 +57,7 @@ st.title("⚛️ MOTOR DE OPTIMIZACIÓN EXERGÉTICA")
 st.caption("Cleronomía Avanzada // Consola Soberana de Diagnóstico y Control de Sistemas Viables Fuera del Equilibrio")
 
 # ==========================================
-# ENLACE CON EL LÓGOS DE DATOS
+# ENLACE CON EL LÓGOS DE DATOS Y MIGRACIÓN
 # ==========================================
 db_disponible = False
 conn = None
@@ -66,14 +66,27 @@ cursor = None
 try:
     conn = psycopg2.connect(DB_URL)
     cursor = conn.cursor()
+    
+    # 1. Asegurar la existencia de la tabla base heredada
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS metric_history (
-            id SERIAL PRIMARY KEY, timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            foco VARCHAR(100), e_in DOUBLE PRECISION, e_out DOUBLE PRECISION, efficiency DOUBLE PRECISION
+            id SERIAL PRIMARY KEY, 
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            e_in DOUBLE PRECISION, 
+            e_out DOUBLE PRECISION, 
+            efficiency DOUBLE PRECISION
         );
     """)
     conn.commit()
-    st.sidebar.success("📡 Conexión síncrona con el Lógos central activa.")
+
+    # 2. INYECCIÓN REPARADORA: Forzar la columna 'foco' si el esquema antiguo no la tenía
+    try:
+        cursor.execute("ALTER TABLE metric_history ADD COLUMN IF NOT EXISTS foco VARCHAR(100);")
+        conn.commit()
+    except Exception:
+        conn.rollback()
+
+    st.sidebar.success("📡 Conexión síncrona y membrana 'foco' reparada.")
     db_disponible = True
 except Exception as e:
     st.sidebar.error(f"Fricción de enlace con DB: {e}")
@@ -100,7 +113,7 @@ foco_metabolico = st.radio(
     key="foco_actual"
 )
 
-# Mapeo de consistencia para leer la base de datos común
+# Mapeo de consistencia semántica hacia las apps comerciales/operativas
 foco_mapeado = "Producción y Fábrica" if "Industrial" in foco_metabolico else "Logística y Almacén" if "Logística" in foco_metabolico else "Cumplimiento Legal y Riesgos" if "Regulatorio" in foco_metabolico else "Inversiones y Dinero"
 
 # ==========================================
@@ -113,9 +126,9 @@ v_ext_2 = st.sidebar.slider("Variedad Inmanejable del Entorno (%):", 0, 100, 35)
 lambda_entorno = 1.0 + ((v_ext_1 + v_ext_2) / 200.0)
 
 # ==========================================
-# ASIGNACIÓN DE ADQUISICIÓN DE DATOS EN TIEMPO REAL
+# ADQUISICIÓN DE DATOS EN TIEMPO REAL DESDE LA MEMBRANA
 # ==========================================
-e_in_real, i_destroyed = 100000.0, 20000.0  # Valores base por si la DB está vacía
+e_in_real, i_destroyed = 100000.0, 20000.0  # Valores base de amortiguación
 
 if db_disponible:
     try:
@@ -186,7 +199,7 @@ with sc2:
 with sc3:
     cap_medio = st.number_input("Límite de Capacidad del Entorno ($K$):", min_value=10.0, value=max(100.0, e_in_real * 1.5))
 
-# Ejecución continua de la simulación
+# Ejecución continua y asíncrona de la trayectoria proyectiva
 potencias, aceleraciones, estados = simular_sistema_transductivo(p_init, f_retro, cap_medio)
 
 df_simulacion = pd.DataFrame({
@@ -209,6 +222,6 @@ st.subheader("Fuerza de Aceleración Interna (Segunda Derivada Discreta)")
 st.area_chart(df_simulacion[["Aceleración Cinética"]])
 
 if "💥 Saturación Metaestable" in estados:
-    st.warning("⚠️ CRÍTICO: La trayectoria proyectada colisionará con la finitud del entorno ($K$). Se requiere expansión de la variedad de Ashby.")
+    st.warning("⚠️ CRÍTICO: La trayectoria proyectada colisionará con la finitud del entorno ($K$). Se requiere expansión de la variedad de Ashby de forma inmediata.")
 else:
     st.success("💎 Homeostasis predictiva asegurada. El acoplamiento con el medio es armónico.")
